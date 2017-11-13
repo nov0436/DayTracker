@@ -5,4 +5,18 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+
+    <string name="main_app_title">DayosTrackos</string>
+    <string name="main_header_identity">Created by nov0436.</string>
+
+
+    <!-- Menu items -->
+    <string name="menu_home">Home</string>
+    <string name="menu_calendar">Calendar</string>
+    <string name="menu_visual_overview">Visual Overview</string>
+    <string name="menu_about">About</string>
+
+
+
 </resources>
