@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DayosTrackos</string>
+    <string name="app_name">DayTracker</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -7,16 +7,76 @@
     <string name="action_settings">Settings</string>
 
 
-    <string name="main_app_title">DayosTrackos</string>
+    <string name="main_app_title">DayTracker</string>
     <string name="main_header_identity">Created by nov0436.</string>
 
 
-    <!-- Menu items -->
+    <!-- Side bar Menu items -->
     <string name="menu_home">Home</string>
     <string name="menu_calendar">Calendar</string>
     <string name="menu_visual_overview">Visual Overview</string>
     <string name="menu_about">About</string>
 
+    <!-- Side bar Menu items -->
+    <string name="welcome">Welcome !</string>
+
+    <string name="main_menu_add_activity">Add new activity</string>
+
+    <string name="main_menu_show_overview">Calendar</string>
+
+    <!-- Activity categories -->
+    <string name="main_cat_movement">Sport activities</string>
+
+    <string name="cat_sport">Sport</string>
+    <string name="cat_exercise">Exercising</string>
+    <string name="cat_travel">Travelling</string>
+
+    <string name="main_cat_education">Educational activities</string>
+
+    <string name="cat_education">Education (podcast, video, etc.)</string>
+    <string name="cat_study">Studying</string>
+    <string name="cat_programming">Programming</string>
+    <string name="cat_writing">Writing</string>
+    <string name="cat_reading">Reading</string>
+    <string name="cat_culture">Culture</string>
+
+    <string name="main_cat_fun">Fun activities</string>
+
+    <string name="cat_fun">Fun</string>
+    <string name="cat_relaxing">Relax</string>
+    <string name="cat_event">Events / concerts</string>
+    <string name="cat_gaming">Gaming</string>
+
+    <string name="main_cat_spiritual">Spiritual activities</string>
+
+    <string name="cat_spiritual">Prayer, worship, etc.</string>
+
+    <string name="main_cat_other">Other activities</string>
+
+    <string name="cat_relationship">Relationships / meetings</string>
+    <string name="cat_working">Work</string>
+    <string name="cat_miscellaneous">Miscellaneous</string>
+
+    <!-- Record types -->
+    <string name="record_note">Write a note</string>
+    <string name="record_voice">Record voice</string>
+    <string name="record_photo">Take a photo</string>
+    <string name="record_video">Record a video</string>
+    <string name="record_location">Record your location</string>
+
+    <!-- Form -->
+    <string name="form_title">Title:</string>
+    <string name="form_note">Your note:</string>
+    <string name="form_category">Category:</string>
+
+    <!-- Form hints -->
+    <string name="form_hint_title">Title of your note...</string>
+    <string name="form_hint_text">Write your note...</string>
+
+    <string name="form_button_category">Select category</string>
+    <string name="form_save">Save</string>
+
+    <string name="form_date_time">Pick your date and time:</string>
 
 
 </resources>
