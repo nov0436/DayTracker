@@ -57,17 +57,44 @@
     <string name="cat_working">Work</string>
     <string name="cat_miscellaneous">Miscellaneous</string>
 
+    <string-array name="category_array">
+        <item>Sport</item>
+        <item>Exercising</item>
+        <item>Travelling</item>
+
+        <item>Education (podcast, video, etc.)</item>
+        <item>Studying</item>
+        <item>Programming</item>
+        <item>Writing</item>
+        <item>Reading</item>
+
+        <item>Culture</item>
+        <item>Events / concerts</item>
+
+        <item>Fun</item>
+        <item>Relax</item>
+        <item>Gaming</item>
+
+        <item>Prayer, worship, etc.</item>
+
+        <item>Relationships / meetings</item>
+
+        <item>Work</item>
+
+        <item>Miscellaneous</item>
+    </string-array>
+
     <!-- Record types -->
     <string name="record_note">Write a note</string>
     <string name="record_voice">Record voice</string>
     <string name="record_photo">Take a photo</string>
     <string name="record_video">Record a video</string>
-    <string name="record_location">Record your location</string>
 
     <!-- Form -->
     <string name="form_title">Title:</string>
     <string name="form_note">Your note:</string>
     <string name="form_category">Category:</string>
+
 
     <!-- Form hints -->
     <string name="form_hint_title">Title of your note...</string>
@@ -77,6 +104,8 @@
     <string name="form_save">Save</string>
 
     <string name="form_date_time">Pick your date and time:</string>
+    <string name="form_selected_category">...</string>
+    <string name="form_save_location">Save location</string>
 
 
 </resources>

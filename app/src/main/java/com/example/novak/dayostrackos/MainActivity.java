@@ -1,7 +1,10 @@
 package com.example.novak.dayostrackos;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -32,13 +35,11 @@ public class MainActivity extends AppCompatActivity
         buttonPhoto = (Button)findViewById(R.id.btnPhoto);
         buttonVideo = (Button)findViewById(R.id.btnVideo);
         buttonVoice = (Button)findViewById(R.id.btnVoice);
-        buttonLocation = (Button)findViewById(R.id.btnLocation);
 
         buttonNote.setOnClickListener(this);
         buttonPhoto.setOnClickListener(this);
         buttonVideo.setOnClickListener(this);
         buttonVoice.setOnClickListener(this);
-        buttonLocation.setOnClickListener(this);
 
         // This may very well be deleted in the future. Really.
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.menu_home) {
-            // Handle the camera action
+
         } else if (id == R.id.menu_calendar) {
 
         } else if (id == R.id.menu_visual_overview) {
@@ -120,15 +121,34 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         int id = v.getId();
-
+        int TAKE_THUMB = 1;
 
         switch (id){
             case R.id.btnNote:
-                Intent intent = new Intent(this, WriteNoteActivity.class);
-                startActivity(intent);
+                Intent intentNote = new Intent(this, WriteNoteActivity.class);
+                startActivity(intentNote);
                 break;
+            case R.id.btnPhoto:
+                Intent intentPhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intentPhoto, TAKE_THUMB );
         }
 
 
     }
+
+    private Bitmap getThumbnailBitmap(String path, int thumbnailSize) {
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, bounds);
+        if ((bounds.outWidth == -1) || (bounds.outHeight == -1)) {
+            return null;
+        }
+        int originalSize = (bounds.outHeight > bounds.outWidth) ? bounds.outHeight
+                : bounds.outWidth;
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inSampleSize = originalSize / thumbnailSize;
+        return BitmapFactory.decodeFile(path, opts);
+    }
+
+
 }
