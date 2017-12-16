@@ -27,7 +27,8 @@
         <activity
             android:name=".DateTimeActivity"
             android:theme="@android:style/Theme.Holo.Light.Dialog" />
-        <activity android:name=".CategoryActivity"></activity>
+        <activity android:name=".CategoryActivity" />
+        <activity android:name=".CalendarActivity"></activity>
     </application>
 
 </manifest>

@@ -20,7 +20,7 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     private static final String TITLE = "title";
     private static final String TEXT = "text";
     private static final String TYPE = "type";
-    private static final String DATETIME = "date";
+    private static final String DATETIME = "datetime";
     private static final String CATEGORY = "category";
     private static final String LOCATION = "location";
     private static final String LINK_TO_RESOURCE = "link_to_resource";
@@ -36,13 +36,13 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.w("Database", "Creating database.");
-
+//        new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
         String CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                       TITLE + " TEXT, " +
+                                                      TEXT + " TEXT, " +
                                                       TYPE + " TEXT, " +
                                                       DATETIME + " DATETIME, " +
-                                                      TYPE + " TEXT, " +
                                                       CATEGORY + " TEXT, " +
                                                       LOCATION + " TEXT, " +
                                                       LINK_TO_RESOURCE + " TEXT )";

@@ -38,9 +38,9 @@ public class Database {
             " WHERE type = (?) AND datetime = (?)";
     private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
             "values ((?), (?), (?), (?), (?), (?), (?))";
-
-    private static final String UPDATE = "update " + TABLE_NAME + " SET name = (?), fueltype = (?), price = (?) WHERE id = (?)";
-    private static final String DELETE = "delete from " + TABLE_NAME + " where id = (?)";
+//
+//    private static final String UPDATE = "update " + TABLE_NAME + " SET name = (?), fueltype = (?), price = (?) WHERE id = (?)";
+//    private static final String DELETE = "delete from " + TABLE_NAME + " where id = (?)";
 
     private Cursor c;
 
@@ -51,12 +51,62 @@ public class Database {
 
         this.db = openHelper.getWritableDatabase();
 
+
+
         this.selectStmt = this.db.compileStatement(SELECT);
         this.insertStmt = this.db.compileStatement(INSERT);
-        this.updateStmt = this.db.compileStatement(UPDATE);
-        this.deleteStmt = this.db.compileStatement(DELETE);
+//        this.updateStmt = this.db.compileStatement(UPDATE);
+//        this.deleteStmt = this.db.compileStatement(DELETE);
+
+//        openHelper.onUpgrade(db, 0, 1);
     }
-/*
+
+
+//    private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
+//            "values ((?), (?), (?), (?), (?), (?), (?))";
+//
+    public long insert(Record r){
+        this.insertStmt.bindString(1, r.title);
+        this.insertStmt.bindString(2, r.text);
+        this.insertStmt.bindString(3, r.type);
+        this.insertStmt.bindString(4, r.datetime);
+        this.insertStmt.bindString(5, r.category);
+        if (r.location != null)
+            this.insertStmt.bindString(6, r.location);
+        else
+            this.insertStmt.bindNull(6);
+        if (r.location != null)
+            this.insertStmt.bindString(7, r.link_to_resource);
+        else
+            this.insertStmt.bindNull(7);
+
+        return this.insertStmt.executeInsert();
+    }
+
+    public Record getFirst() {
+
+        c = this.db.query(TABLE_NAME, new String[] { "title", "text", "type", "datetime", "category", "location", "link_to_resource" },
+                null, null, null, null, null);
+
+        if (c.moveToFirst())
+        {
+            String title = c.getString(0);
+            String text = (c.getString(1));
+            String type = (c.getString(2));
+            String datetime = (c.getString(3));
+            String category  = (c.getString(4));
+            String location = (c.getString(5));
+            String link_to_resource = (c.getString(6));
+
+            Record record = new Record(title, text, type, datetime, category, location, link_to_resource);
+
+            return record;
+        }
+        return null;
+    }
+
+
+    /*
 
 
     public Record getFirst() {

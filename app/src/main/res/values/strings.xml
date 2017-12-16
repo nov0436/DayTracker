@@ -10,6 +10,8 @@
     <string name="main_app_title">DayTracker</string>
     <string name="main_header_identity">Created by nov0436.</string>
 
+    <string name="calendar_title">Calendar</string>
+    <string name="calendar_subtitle">Display what you were up to on a given day!</string>
 
     <!-- Side bar Menu items -->
     <string name="menu_home">Home</string>

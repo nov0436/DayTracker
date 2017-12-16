@@ -29,6 +29,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -40,6 +42,9 @@ import java.util.Locale;
 public class WriteNoteActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
+    TextView textView;
+
+    private Database db;
     private static final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
     static final int GET_DATE_TIME = 1;
@@ -58,9 +63,13 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
     Button btnSelectCategory;
     CheckBox checkBoxSaveLocation;
 
+    String title;
+    String content;
+    String type;
     String locationCity;
     String dateTime;
     String category;
+    String link_to_resource;
 
     int year, month, day, hour, minute;
     int yearFinal, monthFinal, dayFinal, hourFinal, minuteFinal;
@@ -70,6 +79,9 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_note);
 
+        textView = (TextView)findViewById(R.id.textView);
+
+        ///
         btnSaveForm = (Button) findViewById(R.id.buttonSave);
         btnSelectCategory = (Button) findViewById(R.id.buttonSelectCategory);
         checkBoxSaveLocation = (CheckBox) findViewById(R.id.locationCheckBox);
@@ -89,8 +101,8 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         contentEditText = (EditText) findViewById(R.id.noteEditText);
 
-        String currentDateAndTime = new SimpleDateFormat("yyyy-MM-dd   HH:mm").format(new Date());
-        dateTimeDisplayTextView.setText(currentDateAndTime);
+        dateTime = new SimpleDateFormat("yyyy-MM-dd   HH:mm").format(new Date());
+        dateTimeDisplayTextView.setText(dateTime);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -110,14 +122,13 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
                 break;
 
             case R.id.buttonSave:
-                // save the form
                 if (formIsValid())
                 {
-                    Toast.makeText(getApplicationContext(), "Can save", Toast.LENGTH_LONG ).show();
+                    SaveData();
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(), "Cannot save", Toast.LENGTH_LONG ).show();
+                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
                 }
                 break;
 
@@ -145,8 +156,38 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
                         Toast.makeText(getApplicationContext(), "Unable to get your location.", Toast.LENGTH_LONG ).show();
                     }
                 }
+                else
+                {
+                    locationCity = null;
+                }
                 break;
         }
+    }
+
+    private void SaveData() {
+        title = titleEditText.getText().toString();
+        content = contentEditText.getText().toString();
+        type = "note";
+//        dateTime
+        category = selectedCategoryTextView.getText().toString();
+        // locationCity
+        link_to_resource = null;
+
+
+        Record record = new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
+
+        this.db = new Database(getApplicationContext());
+        long insertSuccess = this.db.insert(record);
+
+        if (insertSuccess != 0)
+        {
+            Toast.makeText(this, "The note has been successfully saved.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else
+            Toast.makeText(this, "The note could not be saved.", Toast.LENGTH_SHORT).show();
+
+
     }
 
     private boolean formIsValid() {
