@@ -4,6 +4,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by novak on 16-Dec-17.
@@ -35,7 +40,11 @@ public class Database {
     private static final String TABLE_NAME = "records";
 
     private static final String SELECT = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
-            " WHERE type = (?) AND datetime = (?)";
+            " WHERE type = (?)";
+
+
+
+
     private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
             "values ((?), (?), (?), (?), (?), (?), (?))";
 //
@@ -61,28 +70,6 @@ public class Database {
 //        openHelper.onUpgrade(db, 0, 1);
     }
 
-
-//    private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
-//            "values ((?), (?), (?), (?), (?), (?), (?))";
-//
-    public long insert(Record r){
-        this.insertStmt.bindString(1, r.title);
-        this.insertStmt.bindString(2, r.text);
-        this.insertStmt.bindString(3, r.type);
-        this.insertStmt.bindString(4, r.datetime);
-        this.insertStmt.bindString(5, r.category);
-        if (r.location != null)
-            this.insertStmt.bindString(6, r.location);
-        else
-            this.insertStmt.bindNull(6);
-        if (r.location != null)
-            this.insertStmt.bindString(7, r.link_to_resource);
-        else
-            this.insertStmt.bindNull(7);
-
-        return this.insertStmt.executeInsert();
-    }
-
     public Record getFirst() {
 
         c = this.db.query(TABLE_NAME, new String[] { "title", "text", "type", "datetime", "category", "location", "link_to_resource" },
@@ -103,6 +90,96 @@ public class Database {
             return record;
         }
         return null;
+    }
+
+
+
+    //    private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
+//            "values ((?), (?), (?), (?), (?), (?), (?))";
+//
+    public long insert(Record r){
+        this.insertStmt.bindString(1, r.title);
+        this.insertStmt.bindString(2, r.text);
+        this.insertStmt.bindString(3, r.type);
+        this.insertStmt.bindString(4, r.datetime);
+        this.insertStmt.bindString(5, r.category);
+        if (r.location != null)
+            this.insertStmt.bindString(6, r.location);
+        else
+            this.insertStmt.bindNull(6);
+        if (r.link_to_resource != null)
+            this.insertStmt.bindString(7, r.link_to_resource);
+        else
+            this.insertStmt.bindNull(7);
+
+        return this.insertStmt.executeInsert();
+    }
+
+    public Record selectPhoto()
+    {
+        Cursor c = db.rawQuery(SELECT, new String[] {"photo"});
+        Record record;
+        if (c.moveToLast())
+        {
+            do {
+                String title = c.getString(0);
+                String text = (c.getString(1));
+                String type = (c.getString(2));
+                String datetime = (c.getString(3));
+                String category = (c.getString(4));
+                String location = (c.getString(5));
+                String link_to_resource = (c.getString(6));
+
+                record = new Record(title, text, type, datetime, category, location, link_to_resource);
+            } while(c.moveToNext());
+            c.close();
+            db.close();
+
+            return record;
+        }
+
+        return null;
+    }
+
+
+//    private static final String SELECT_BY_DATE = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
+//            " WHERE datetime = strftime('%Y-%m-%d   %H:%M', '2017-12-17   17:59');";
+
+    private static final String SELECT_BY_DATE = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
+            " WHERE date(datetime) = date(?);";
+
+
+
+    public ArrayList<Record> selectAllByDate(String selectedDateTime) {
+
+        ArrayList<Record> list = new ArrayList<Record>();
+
+        Cursor c = db.rawQuery(SELECT_BY_DATE, new String[] {selectedDateTime});
+
+        Log.d("message", "searching for datetime: " + selectedDateTime);
+
+        if (c.moveToFirst()) {
+            do {
+//                int id = cursor.getInt(0);
+                String title = c.getString(0);
+                String text = c.getString(1);
+                String type = c.getString(2);
+                String datetime = c.getString(3);
+                String category = c.getString(4);
+                String location = c.getString(5);
+                String link_to_resource = c.getString(6);
+
+                Record record = new Record(title, text, type, datetime, category, location, link_to_resource);
+
+                list.add(record);
+
+            } while (c.moveToNext());
+        }
+        if (c != null && !c.isClosed()) {
+            c.close();
+        }
+
+        return list;
     }
 
 

@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.novak.dayostrackos.PhotoActivity">
-
+    tools:context="com.example.novak.dayostrackos.VoiceActivity">
 
     <TextView
         android:id="@+id/headerTextView"
@@ -15,7 +14,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/record_photo"
+        android:text="@string/record_voice"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +68,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="@string/form_photo_hint_title"
+        android:hint="@string/form_voice_hint_title"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +87,7 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:gravity="top"
-        android:hint="@string/form_photo_hint_text"
+        android:hint="@string/form_video_hint_text"
         android:inputType="textMultiLine"
         android:selectAllOnFocus="false"
         android:singleLine="false"
@@ -166,14 +165,14 @@
         app:layout_constraintVertical_bias="0.894" />
 
     <Button
-        android:id="@+id/buttonPhoto"
+        android:id="@+id/buttonRecord"
         android:layout_width="113dp"
         android:layout_height="91dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/record_photo"
+        android:text="@string/record_voice"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.098"
@@ -197,5 +196,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.45"
         app:srcCompat="@mipmap/ic_launcher" />
+
 
 </android.support.constraint.ConstraintLayout>

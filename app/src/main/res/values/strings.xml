@@ -113,4 +113,13 @@
     <string name="form_photo_hint_title">Title of your photo...</string>
     <string name="form_photo_hint_text">Write your commentary...</string>
 
+    <!-- Form video hints -->
+    <string name="form_video_hint_title">Title of your video...</string>
+    <string name="form_video_hint_text">Write your commentary...</string>
+
+    <!-- Form voice hints -->
+    <string name="form_voice_hint_title">Title of your recording...</string>
+    <string name="form_voice_hint_text">Write your commentary...</string>
+    <string name="title_activity_day_list">DayListActivity</string>
+
 </resources>

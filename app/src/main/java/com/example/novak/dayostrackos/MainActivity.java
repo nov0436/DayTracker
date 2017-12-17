@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        int TAKE_THUMB = 1;
 
         switch (id){
             case R.id.btnNote:
@@ -133,24 +132,14 @@ public class MainActivity extends AppCompatActivity
             case R.id.btnPhoto:
                 Intent intentPhoto = new Intent(this, PhotoActivity.class);
                 startActivity(intentPhoto);
+                break;
+            case R.id.btnVideo:
+                Intent intentVideo = new Intent(this, VideoActivity.class);
+                startActivity(intentVideo);
+                break;
+            case R.id.btnVoice:
+                Intent intentVoice = new Intent(this, VoiceActivity.class);
+                startActivity(intentVoice);
         }
-
-
     }
-
-    private Bitmap getThumbnailBitmap(String path, int thumbnailSize) {
-        BitmapFactory.Options bounds = new BitmapFactory.Options();
-        bounds.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, bounds);
-        if ((bounds.outWidth == -1) || (bounds.outHeight == -1)) {
-            return null;
-        }
-        int originalSize = (bounds.outHeight > bounds.outWidth) ? bounds.outHeight
-                : bounds.outWidth;
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inSampleSize = originalSize / thumbnailSize;
-        return BitmapFactory.decodeFile(path, opts);
-    }
-
-
 }

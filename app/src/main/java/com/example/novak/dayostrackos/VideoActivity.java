@@ -4,21 +4,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,14 +29,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class PhotoActivity extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
+public class VideoActivity  extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
@@ -69,20 +64,18 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     Button btnSelectCategory;
     CheckBox checkBoxSaveLocation;
 
-    Button btnTakePicture;
+    Button btnRecordVideo;
     ImageView thumbnailImageView;
 
-    TextView textView;
-    String linkToPictureToSave;
-    Uri pictureUri;
+    String linkToVideoToSave;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_VIDEO_CAPTURE = 1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
+        setContentView(R.layout.activity_video);
 
         /// jednotna cast
         btnSaveForm = (Button) findViewById(R.id.buttonSave);
@@ -110,12 +103,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
         /// jednotna cast end
 
-
         thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
-        btnTakePicture = (Button) findViewById(R.id.buttonPhoto);
-        btnTakePicture.setOnClickListener(this);
+        btnRecordVideo = (Button) findViewById(R.id.buttonVideo);
+        btnRecordVideo.setOnClickListener(this);
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -129,7 +120,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
 
-                DatePickerDialog datePickerDialog = new DatePickerDialog(PhotoActivity.this, PhotoActivity.this, year, month, day);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(VideoActivity.this, VideoActivity.this, year, month, day);
                 datePickerDialog.show();
                 break;
 
@@ -178,20 +169,19 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
             /////////////////////////
             //// INDIVIDUAL
             /////////////////////////
-            case R.id.buttonPhoto:
-                dispatchTakePictureIntent();
+            case R.id.buttonVideo:
+                dispatchRecordVideoIntent();
                 break;
 
         }
     }
-
     private void SaveData() {
 
         title = titleEditText.getText().toString();
         content = contentEditText.getText().toString();
-        type = "photo";
+        type = "video";
         category = selectedCategoryTextView.getText().toString();
-        link_to_resource = linkToPictureToSave;
+        link_to_resource = linkToVideoToSave;
 
         Record record = new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
 
@@ -200,11 +190,11 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
         if (insertSuccess != 0)
         {
-            Toast.makeText(this, "The photo has been successfully saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video has been successfully saved.", Toast.LENGTH_SHORT).show();
             finish();
         }
         else
-            Toast.makeText(this, "The photo could not be saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video could not be saved.", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -221,11 +211,28 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         {
             return false;
         }
-        if (TextUtils.isEmpty(linkToPictureToSave))
+        if (TextUtils.isEmpty(linkToVideoToSave))
         {
             return false;
         }
         return true;
+    }
+    File videoFileGlobal;
+    private void dispatchRecordVideoIntent() {
+        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+        File videoDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        String videoName = getVideoName();
+        File videoFile = new File(videoDirectory, videoName);
+        videoFileGlobal = videoFile;
+
+        videoUri = Uri.fromFile(videoFile);
+
+        linkToVideoToSave = videoUri.toString();
+
+        videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri );
+        startActivityForResult(videoIntent, REQUEST_VIDEO_CAPTURE);
+
     }
 
     @Override
@@ -237,49 +244,38 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 selectedCategoryTextView.setText(category);
             }
         }
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             displayThumbnail();
         }
     }
 
 
+    Uri videoUri;
 
-    private void dispatchTakePictureIntent() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String pictureName = getPictureName();
-        File imageFile = new File(pictureDirectory, pictureName);
-        pictureUri = Uri.fromFile(imageFile);
-
-        linkToPictureToSave = pictureUri.toString();
-
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri );
-        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
-
-}
-
-    private String getPictureName() {
+    private String getVideoName() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + ".jpg";
-        return imageFileName;
+        String videoFileName = "VID_" + timeStamp + ".3gp";
+        return videoFileName;
     }
 
 
 
     private void displayThumbnail() {
         final int THUMBSIZE = 256;
-        String tempUriString = pictureUri.toString();
+        String tempUriString = videoUri.toString();
         Uri newUri = Uri.parse(tempUriString);
 
-        File imageFile = new File(newUri.getPath());
-        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(
-                BitmapFactory.decodeFile(imageFile.getAbsolutePath()),
-                THUMBSIZE,
-                THUMBSIZE);
+        File videoFile = new File(newUri.getPath());
+
+        Bitmap thumbImage = createThumbnailFromPath(videoFileGlobal.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND);
 
         thumbnailImageView.setImageBitmap(thumbImage);
         thumbnailImageView.setVisibility(View.VISIBLE);
+    }
+
+    public Bitmap createThumbnailFromPath(String filePath, int type){
+        return ThumbnailUtils.createVideoThumbnail(filePath, type);
     }
 
     ////////////////////////////////////
@@ -295,7 +291,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         hour = c.get(Calendar.HOUR_OF_DAY);
         minute = c.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(PhotoActivity.this, PhotoActivity.this,
+        TimePickerDialog timePickerDialog = new TimePickerDialog(VideoActivity.this, VideoActivity.this,
                 hour, minute, android.text.format.DateFormat.is24HourFormat(this));
         timePickerDialog.show();
 

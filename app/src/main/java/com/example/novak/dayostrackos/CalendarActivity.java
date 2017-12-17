@@ -1,15 +1,19 @@
 package com.example.novak.dayostrackos;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.CalendarView;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class CalendarActivity extends AppCompatActivity implements CalendarView.OnDateChangeListener {
+public class CalendarActivity extends AppCompatActivity implements  CalendarView.OnDateChangeListener {
 
     private Calendar calendar;
 
@@ -24,11 +28,14 @@ public class CalendarActivity extends AppCompatActivity implements CalendarView.
 
     @Override
     public void onSelectedDayChange( CalendarView view, int year, int month, int dayOfMonth) {
-//        calendar = new GregorianCalendar( year, month, dayOfMonth );
+        month += 1;
 
-        String dateTime = String.format("%d-%d-%d", year, month, dayOfMonth);
+        String selectedDate = String.format("%d-%d-%d", year, month, dayOfMonth);
 
-        Toast.makeText(this, dateTime, Toast.LENGTH_SHORT).show();
-
+        Intent dayIntent = new Intent(this, DayListActivity.class);
+        dayIntent.putExtra("datetime", selectedDate);
+        startActivity(dayIntent);
     }
+
+
 }

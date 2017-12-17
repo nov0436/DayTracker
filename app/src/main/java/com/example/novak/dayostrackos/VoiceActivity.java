@@ -8,17 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,14 +30,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class PhotoActivity extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
+public class VoiceActivity extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
@@ -69,20 +65,18 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     Button btnSelectCategory;
     CheckBox checkBoxSaveLocation;
 
-    Button btnTakePicture;
+    Button btnRecordVoice;
     ImageView thumbnailImageView;
 
-    TextView textView;
-    String linkToPictureToSave;
-    Uri pictureUri;
+    String linkToRecordingToSave;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_VOICE_CAPTURE = 1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
+        setContentView(R.layout.activity_voice);
 
         /// jednotna cast
         btnSaveForm = (Button) findViewById(R.id.buttonSave);
@@ -110,12 +104,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
         /// jednotna cast end
 
-
         thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
-        btnTakePicture = (Button) findViewById(R.id.buttonPhoto);
-        btnTakePicture.setOnClickListener(this);
+        btnRecordVoice = (Button) findViewById(R.id.buttonRecord);
+        btnRecordVoice.setOnClickListener(this);
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -129,7 +121,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
 
-                DatePickerDialog datePickerDialog = new DatePickerDialog(PhotoActivity.this, PhotoActivity.this, year, month, day);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(VoiceActivity.this, VoiceActivity.this, year, month, day);
                 datePickerDialog.show();
                 break;
 
@@ -178,20 +170,19 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
             /////////////////////////
             //// INDIVIDUAL
             /////////////////////////
-            case R.id.buttonPhoto:
-                dispatchTakePictureIntent();
+            case R.id.buttonRecord:
+                dispatchRecordVoiceIntent();
                 break;
 
         }
     }
-
     private void SaveData() {
 
         title = titleEditText.getText().toString();
         content = contentEditText.getText().toString();
-        type = "photo";
+        type = "audio";
         category = selectedCategoryTextView.getText().toString();
-        link_to_resource = linkToPictureToSave;
+        link_to_resource = linkToRecordingToSave;
 
         Record record = new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
 
@@ -200,11 +191,11 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
         if (insertSuccess != 0)
         {
-            Toast.makeText(this, "The photo has been successfully saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The recording has been successfully saved.", Toast.LENGTH_SHORT).show();
             finish();
         }
         else
-            Toast.makeText(this, "The photo could not be saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The recording could not be saved.", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -221,11 +212,57 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         {
             return false;
         }
-        if (TextUtils.isEmpty(linkToPictureToSave))
+        if (TextUtils.isEmpty(linkToRecordingToSave))
         {
             return false;
         }
         return true;
+    }
+
+
+    private void dispatchRecordVoiceIntent() {
+        Intent recordingIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+
+        File recordingDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        String recordingName = getRecordingName();
+        File recordingFile = new File(recordingDirectory, recordingName);
+
+        voiceUri = Uri.fromFile(recordingFile);
+
+        linkToRecordingToSave = voiceUri.toString();
+
+        recordingIntent.putExtra(MediaStore.EXTRA_OUTPUT, voiceUri );
+        startActivityForResult(recordingIntent, REQUEST_VOICE_CAPTURE);
+
+    }
+
+    public static String getPathForAudio(Context context, Uri uri)
+    {
+        String result = null;
+        Cursor cursor = null;
+
+        try {
+            String[] proj = { MediaStore.Audio.Media.DATA };
+            cursor = context.getContentResolver().query(uri, proj, null, null, null);
+            if (cursor == null) {
+                result = uri.getPath();
+            } else {
+                cursor.moveToFirst();
+                int column_index = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA);
+                result = cursor.getString(column_index);
+                cursor.close();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return result;
     }
 
     @Override
@@ -237,49 +274,48 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 selectedCategoryTextView.setText(category);
             }
         }
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            displayThumbnail();
+        if (requestCode == REQUEST_VOICE_CAPTURE && resultCode == RESULT_OK) {
+            String realPath = null;
+            Uri uriPath = null;
+            realPath = getPathForAudio(this, data.getData());
+            uriPath = Uri.fromFile(new File(realPath));
+
+            voiceUri = uriPath;
+            try{
+                MediaPlayer  mp = MediaPlayer.create(getApplicationContext(), uriPath);
+                mp.start();
+            }catch(NullPointerException e) {
+                // handle NullPointerException
+            }
         }
     }
 
 
+    Uri voiceUri;
 
-    private void dispatchTakePictureIntent() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String pictureName = getPictureName();
-        File imageFile = new File(pictureDirectory, pictureName);
-        pictureUri = Uri.fromFile(imageFile);
-
-        linkToPictureToSave = pictureUri.toString();
-
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri );
-        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
-
-}
-
-    private String getPictureName() {
+    private String getRecordingName() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + ".jpg";
-        return imageFileName;
+        String recordingFileName = "REC_" + timeStamp + ".3gpp";
+        return recordingFileName;
     }
 
 
 
-    private void displayThumbnail() {
-        final int THUMBSIZE = 256;
-        String tempUriString = pictureUri.toString();
+    private void playRecording() {
+
+        String tempUriString = voiceUri.toString();
         Uri newUri = Uri.parse(tempUriString);
 
-        File imageFile = new File(newUri.getPath());
-        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(
-                BitmapFactory.decodeFile(imageFile.getAbsolutePath()),
-                THUMBSIZE,
-                THUMBSIZE);
+        try{
+            MediaPlayer  mp = MediaPlayer.create(getApplicationContext(), voiceUri);
+            mp.start();
+        }catch(NullPointerException e) {
+            // handle NullPointerException
+        }
 
-        thumbnailImageView.setImageBitmap(thumbImage);
-        thumbnailImageView.setVisibility(View.VISIBLE);
+//        Toast.makeText(this, tempUriString, Toast.LENGTH_SHORT).show();
+//        thumbnailImageView.setVisibility(View.VISIBLE);
     }
 
     ////////////////////////////////////
@@ -295,7 +331,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         hour = c.get(Calendar.HOUR_OF_DAY);
         minute = c.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(PhotoActivity.this, PhotoActivity.this,
+        TimePickerDialog timePickerDialog = new TimePickerDialog(VoiceActivity.this, VoiceActivity.this,
                 hour, minute, android.text.format.DateFormat.is24HourFormat(this));
         timePickerDialog.show();
 
