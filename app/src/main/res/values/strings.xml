@@ -98,7 +98,7 @@
     <string name="form_category">Category:</string>
 
 
-    <!-- Form hints -->
+    <!-- Form note hints -->
     <string name="form_hint_title">Title of your note...</string>
     <string name="form_hint_text">Write your note...</string>
 
@@ -109,5 +109,8 @@
     <string name="form_selected_category">...</string>
     <string name="form_save_location">Save location</string>
 
+    <!-- Form photo hints -->
+    <string name="form_photo_hint_title">Title of your photo...</string>
+    <string name="form_photo_hint_text">Write your commentary...</string>
 
 </resources>

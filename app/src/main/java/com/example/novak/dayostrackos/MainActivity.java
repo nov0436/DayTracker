@@ -131,8 +131,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intentNote);
                 break;
             case R.id.btnPhoto:
-                Intent intentPhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intentPhoto, TAKE_THUMB );
+                Intent intentPhoto = new Intent(this, PhotoActivity.class);
+                startActivity(intentPhoto);
         }
 
 
