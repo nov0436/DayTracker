@@ -19,6 +19,8 @@
     <string name="menu_visual_overview">Visual Overview</string>
     <string name="menu_about">About</string>
 
+    <string name="graph_title">Overview of the last month</string>
+
     <!-- Side bar Menu items -->
     <string name="welcome">Welcome !</string>
 

@@ -106,7 +106,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, CalendarActivity.class);
             startActivity(intent);
         } else if (id == R.id.menu_visual_overview) {
-
+            Intent intent = new Intent(this, GraphActivity.class);
+            startActivity(intent);
         } else if (id == R.id.menu_about) {
 
         } else if (id == R.id.nav_share) {

@@ -16,7 +16,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_foreground"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -53,7 +53,8 @@
         <activity android:name=".DisplayNoteActivity" />
         <activity android:name=".DisplayVideoActivity" />
         <activity android:name=".DisplayPhotoActivity" />
-        <activity android:name=".DisplayVoiceActivity"></activity>
+        <activity android:name=".DisplayVoiceActivity" />
+        <activity android:name=".GraphActivity"></activity>
     </application>
 
 </manifest>

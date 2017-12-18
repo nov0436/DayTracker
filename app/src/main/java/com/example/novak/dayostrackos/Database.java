@@ -178,6 +178,13 @@ public class Database {
     private static final String SELECT_BY_DATE = "SELECT id, title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
             " WHERE date(datetime) = date(?);";
 
+//    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
+//            " WHERE category = (?) AND date(?) >= date(datetime)" ;
+
+//
+//    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
+//            " WHERE category = (?) AND datetime('now', 'start of month') AND datetime('now', 'localtime')" ;
+
 
 
     public ArrayList<Record> selectAllByDate(String selectedDateTime) {
@@ -212,6 +219,24 @@ public class Database {
         return list;
     }
 
+    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
+            " WHERE category = (?) AND date(datetime) >= date(datetime('now', 'start of month')) AND date(datetime) <= date(datetime('now', 'localtime'))" ;
+
+    public int selectNumberOfOccurenciesOfCategory(String category) {
+
+        ArrayList<Record> list = new ArrayList<Record>();
+
+        Cursor c = db.rawQuery(SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH, new String[] {category});
+        int numberOfOccurencies = 0;// = c.getCount();
+
+        if (c.moveToNext())
+        {
+            numberOfOccurencies = c.getInt(0);
+        }
+        c.close();
+
+        return numberOfOccurencies;
+    }
 
     /*
 
