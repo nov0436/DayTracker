@@ -1,4 +1,4 @@
-# DayosTrackos
+# DayTracker
 
 DayosTrackos umožňuje zaznamenávání různých věcí / zážitků / aktivit daného dne prostřednictvím psaní zápisek,
 focení, točení videí, nahrávání hlasu (multimedia), geolokace. Následně bude data ukládat
