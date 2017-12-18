@@ -64,7 +64,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
     Button btnSelectCategory;
     CheckBox checkBoxSaveLocation;
 
-    Button btnRecordVideo;
+    ImageView btnRecordVideo;
     ImageView thumbnailImageView;
 
     String linkToVideoToSave;
@@ -104,7 +104,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
         /// jednotna cast end
 
         thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
-        btnRecordVideo = (Button) findViewById(R.id.buttonVideo);
+        btnRecordVideo = (ImageView) findViewById(R.id.videoImageView);
         btnRecordVideo.setOnClickListener(this);
     }
 
@@ -169,7 +169,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
             /////////////////////////
             //// INDIVIDUAL
             /////////////////////////
-            case R.id.buttonVideo:
+            case R.id.videoImageView:
                 dispatchRecordVideoIntent();
                 break;
 

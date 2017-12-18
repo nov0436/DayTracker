@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -69,7 +70,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     Button btnSelectCategory;
     CheckBox checkBoxSaveLocation;
 
-    Button btnTakePicture;
+    ImageView btnTakePicture;
     ImageView thumbnailImageView;
 
     TextView textView;
@@ -112,7 +113,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
 
         thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
-        btnTakePicture = (Button) findViewById(R.id.buttonPhoto);
+        btnTakePicture = (ImageView) findViewById(R.id.cameraImageView);
         btnTakePicture.setOnClickListener(this);
     }
 
@@ -178,7 +179,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
             /////////////////////////
             //// INDIVIDUAL
             /////////////////////////
-            case R.id.buttonPhoto:
+            case R.id.cameraImageView:
                 dispatchTakePictureIntent();
                 break;
 

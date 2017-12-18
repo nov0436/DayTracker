@@ -1,54 +1,36 @@
 package com.example.novak.dayostrackos;
 
-import android.Manifest;
+
 import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
-import android.media.Image;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.DatePicker;
+
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.text.DateFormat;
-import java.text.Format;
+import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
-public class DisplayNoteActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView textView;
+public class DisplayPhotoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Database db;
-    private static final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
-    static final int GET_DATE_TIME = 1;
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
 
     EditText titleEditText;
@@ -62,10 +44,9 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
 
     ImageView btnDeleteRecord;
     ImageView btnSaveForm;
+    ImageView thumbnailImageView;
+
     Button btnSelectCategory;
-
-
-    CheckBox checkBoxSaveLocation;
 
     String title;
     String content;
@@ -75,19 +56,15 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
     String category;
     String link_to_resource;
 
-    int year, month, day, hour, minute;
-    int yearFinal, monthFinal, dayFinal, hourFinal, minuteFinal;
-
     Record record;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_note);
+        setContentView(R.layout.activity_display_photo);
 
         Intent incomingIntent = getIntent();
-        record = (Record)incomingIntent.getSerializableExtra("recordObject");
-
+        record = (Record) incomingIntent.getSerializableExtra("recordObject");
 
 
         ///
@@ -111,7 +88,13 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
 
         dateTime = new SimpleDateFormat("yyyy-MM-dd   HH:mm").format(new Date());
 
-        locationTextView = (TextView)findViewById(R.id.locationResultTextView);
+        locationTextView = (TextView) findViewById(R.id.locationResultTextView);
+
+        thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
+
+        displayThumbnail();
+
+        thumbnailImageView.setOnClickListener(this);
 
         // setting of fields from the incoming object
         if (record.getLocation() != null)
@@ -119,10 +102,14 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
         else
             locationTextView.setText("not specified");
 
+        link_to_resource = record.getLinkToResource();
+
         titleEditText.setText(record.getTitle());
         contentEditText.setText(record.getText());
         selectedCategoryTextView.setText(record.getCategory());
         dateTimeDisplayTextView.setText(record.getDatetime());
+
+
     }
 
     @Override
@@ -130,14 +117,11 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
         int id = v.getId();
 
         switch (id) {
-           case R.id.saveImageView:
-                if (formIsValid())
-                {
+            case R.id.saveImageView:
+                if (formIsValid()) {
                     saveData();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.deleteImageView:
@@ -149,6 +133,10 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
                 startActivityForResult(intentCategory, GET_CATEGORY_FROM_LISTVIEW);
                 break;
 
+            case R.id.thumbnailImageView:
+                dispatchShowPictureIntent();
+                break;
+
         }
     }
 
@@ -156,49 +144,64 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
         this.db = new Database(getApplicationContext());
         long deleteSuccess = this.db.delete(record.id);
 
-        if (deleteSuccess != 0)
-        {
-            Toast.makeText(this, "The note has been successfully deleted.", Toast.LENGTH_SHORT).show();
+        if (deleteSuccess != 0) {
+            Toast.makeText(this, "The photo has been successfully deleted.", Toast.LENGTH_SHORT).show();
             finish();
-        }
-        else
-            Toast.makeText(this, "The note could not be deleted.", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "The photo could not be deleted.", Toast.LENGTH_SHORT).show();
     }
 
     private void saveData() {
         title = titleEditText.getText().toString();
         content = contentEditText.getText().toString();
-        type = "note";
         category = selectedCategoryTextView.getText().toString();
-        link_to_resource = null;
 
         Record recordWithUpdatedValues = new Record(record.id, title, content, type, dateTime, category, locationCity, link_to_resource);
 
         this.db = new Database(getApplicationContext());
         long updateSuccess = this.db.update(recordWithUpdatedValues);
 
-        if (updateSuccess != 0)
-        {
-            Toast.makeText(this, "The note has been successfully saved.", Toast.LENGTH_SHORT).show();
+        if (updateSuccess != 0) {
+            Toast.makeText(this, "The photo has been successfully saved.", Toast.LENGTH_SHORT).show();
             finish();
-        }
-        else
-            Toast.makeText(this, "The note could not be saved.", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "The photo could not be saved.", Toast.LENGTH_SHORT).show();
+    }
 
 
+    private void dispatchShowPictureIntent() {
+        Uri uri = Uri.parse(record.getLinkToResource());
+
+        Intent pictureIntent = new Intent(Intent.ACTION_VIEW);
+        pictureIntent.setDataAndType(uri, "image/*");
+
+        startActivity(pictureIntent);
+    }
+
+
+    private void displayThumbnail() {
+        final int THUMBSIZE = 256;
+
+        Uri newUri = Uri.parse(record.getLinkToResource());
+
+        File imageFile = new File(newUri.getPath());
+        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(
+                BitmapFactory.decodeFile(imageFile.getAbsolutePath()),
+                THUMBSIZE,
+                THUMBSIZE);
+
+        thumbnailImageView.setImageBitmap(thumbImage);
+        thumbnailImageView.setVisibility(View.VISIBLE);
     }
 
     private boolean formIsValid() {
-        if (TextUtils.isEmpty(titleEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(titleEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(contentEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(contentEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(record.getCategory()))
-        {
+        if (TextUtils.isEmpty(record.getCategory())) {
             return false;
         }
         return true;
@@ -208,7 +211,7 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == GET_CATEGORY_FROM_LISTVIEW) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 category = data.getStringExtra("category");
                 selectedCategoryTextView.setText(category);
             }

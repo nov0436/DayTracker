@@ -35,7 +35,7 @@
 
     <string name="main_cat_education">Educational activities</string>
 
-    <string name="cat_education">Education (podcast, video, etc.)</string>
+    <string name="cat_education">Self-Education</string>
     <string name="cat_study">Studying</string>
     <string name="cat_programming">Programming</string>
     <string name="cat_writing">Writing</string>
@@ -51,20 +51,21 @@
 
     <string name="main_cat_spiritual">Spiritual activities</string>
 
-    <string name="cat_spiritual">Prayer, worship, etc.</string>
+    <string name="cat_spiritual">Prayer, worship...</string>
 
     <string name="main_cat_other">Other activities</string>
 
-    <string name="cat_relationship">Relationships / meetings</string>
+    <string name="cat_relationship">Relationships</string>
     <string name="cat_working">Work</string>
     <string name="cat_miscellaneous">Miscellaneous</string>
+    <string name="cat_nature">Nature</string>
 
     <string-array name="category_array">
         <item>Sport</item>
         <item>Exercising</item>
         <item>Travelling</item>
 
-        <item>Education (podcast, video, etc.)</item>
+        <item>Self-education</item>
         <item>Studying</item>
         <item>Programming</item>
         <item>Writing</item>
@@ -74,12 +75,13 @@
         <item>Events / concerts</item>
 
         <item>Fun</item>
+        <item>Nature</item>
         <item>Relax</item>
         <item>Gaming</item>
 
-        <item>Prayer, worship, etc.</item>
+        <item>Prayer, worship...</item>
 
-        <item>Relationships / meetings</item>
+        <item>Relationships</item>
 
         <item>Work</item>
 
@@ -120,6 +122,7 @@
     <!-- Form voice hints -->
     <string name="form_voice_hint_title">Title of your recording...</string>
     <string name="form_voice_hint_text">Write your commentary...</string>
+
     <string name="title_activity_day_list">DayListActivity</string>
 
 </resources>

@@ -42,9 +42,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".WriteNoteActivity" />
-        <activity
-            android:name=".DateTimeActivity"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" />
         <activity android:name=".CategoryActivity" />
         <activity
             android:name=".CalendarActivity"
@@ -53,7 +50,10 @@
         <activity android:name=".VideoActivity" />
         <activity android:name=".VoiceActivity" />
         <activity android:name=".DayListActivity" />
-        <activity android:name=".DisplayNoteActivity"></activity>
+        <activity android:name=".DisplayNoteActivity" />
+        <activity android:name=".DisplayVideoActivity" />
+        <activity android:name=".DisplayPhotoActivity" />
+        <activity android:name=".DisplayVoiceActivity"></activity>
     </application>
 
 </manifest>

@@ -170,7 +170,6 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         // locationCity
         link_to_resource = null;
 
-
         Record record = new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
 
         this.db = new Database(getApplicationContext());

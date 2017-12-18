@@ -65,8 +65,8 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     Button btnSelectCategory;
     CheckBox checkBoxSaveLocation;
 
-    Button btnRecordVoice;
-    ImageView thumbnailImageView;
+    ImageView btnRecordVoice;
+    ImageView playImageView;
 
     String linkToRecordingToSave;
 
@@ -104,8 +104,10 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
 
         /// jednotna cast end
 
-        thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
-        btnRecordVoice = (Button) findViewById(R.id.buttonRecord);
+        playImageView = (ImageView) findViewById(R.id.playImageView);
+        btnRecordVoice = (ImageView) findViewById(R.id.recordImageView);
+
+        playImageView.setOnClickListener(this);
         btnRecordVoice.setOnClickListener(this);
     }
 
@@ -170,8 +172,12 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             /////////////////////////
             //// INDIVIDUAL
             /////////////////////////
-            case R.id.buttonRecord:
+            case R.id.recordImageView:
                 dispatchRecordVoiceIntent();
+                break;
+
+            case R.id.playImageView:
+                playRecording();
                 break;
 
         }
@@ -223,15 +229,9 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     private void dispatchRecordVoiceIntent() {
         Intent recordingIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
 
-        File recordingDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        String recordingName = getRecordingName();
-        File recordingFile = new File(recordingDirectory, recordingName);
-
-        voiceUri = Uri.fromFile(recordingFile);
-
-        linkToRecordingToSave = voiceUri.toString();
-
-        recordingIntent.putExtra(MediaStore.EXTRA_OUTPUT, voiceUri );
+//        linkToRecordingToSave = voiceUri.toString();
+//
+//        recordingIntent.putExtra(MediaStore.EXTRA_OUTPUT, voiceUri );
         startActivityForResult(recordingIntent, REQUEST_VOICE_CAPTURE);
 
     }
@@ -281,12 +281,11 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             uriPath = Uri.fromFile(new File(realPath));
 
             voiceUri = uriPath;
-            try{
-                MediaPlayer  mp = MediaPlayer.create(getApplicationContext(), uriPath);
-                mp.start();
-            }catch(NullPointerException e) {
-                // handle NullPointerException
-            }
+            linkToRecordingToSave = voiceUri.toString();
+            playImageView.setVisibility(View.VISIBLE);
+        }
+        else if (requestCode == REQUEST_VOICE_CAPTURE && resultCode == RESULT_CANCELED) {
+            playImageView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -315,7 +314,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
         }
 
 //        Toast.makeText(this, tempUriString, Toast.LENGTH_SHORT).show();
-//        thumbnailImageView.setVisibility(View.VISIBLE);
+
     }
 
     ////////////////////////////////////

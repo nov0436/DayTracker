@@ -104,8 +104,14 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
         else
             shortenedCommentary = record.getText();
 
+        String shortenedTitle;
+        if (record.getTitle().length() > 30)
+            shortenedTitle = record.getTitle().substring(0, 35).concat("...");
+        else
+            shortenedTitle = record.getTitle();
+
         viewHolder.itemImageView.setImageBitmap(bitmapToDisplay);
-        viewHolder.titleTextView.setText(record.getTitle());
+        viewHolder.titleTextView.setText(shortenedTitle);
         viewHolder.categoryTextView.setText(record.getCategory());
         viewHolder.commentaryTextView.setText(shortenedCommentary);
         viewHolder.typeTextView.setText(capitalizedType);

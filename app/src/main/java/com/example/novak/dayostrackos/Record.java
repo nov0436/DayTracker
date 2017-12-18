@@ -1,4 +1,5 @@
 package com.example.novak.dayostrackos;
+
 import java.io.Serializable;
 
 /**
@@ -17,8 +18,7 @@ public class Record implements Serializable {
     public String link_to_resource;
 
 
-    public Record(String title, String text, String type, String datetime, String category, String location, String link_to_resource)
-    {
+    public Record(String title, String text, String type, String datetime, String category, String location, String link_to_resource) {
         this.title = title;
         this.text = text;
         this.type = type;
@@ -28,8 +28,7 @@ public class Record implements Serializable {
         this.link_to_resource = link_to_resource;
     }
 
-    public Record(int id, String title, String text, String type, String datetime, String category, String location, String link_to_resource)
-    {
+    public Record(int id, String title, String text, String type, String datetime, String category, String location, String link_to_resource) {
         this.id = id;
         this.title = title;
         this.text = text;
@@ -40,44 +39,37 @@ public class Record implements Serializable {
         this.link_to_resource = link_to_resource;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public String getText()
-    {
+    public String getText() {
         return text;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getDatetime()
-    {
+    public String getDatetime() {
         return datetime;
     }
 
-    public String getCategory()
-    {
+    public String getCategory() {
         return category;
     }
-    public String getLocation()
-    {
+
+    public String getLocation() {
         return location;
     }
-    public String getLinkToResource()
-    {
+
+    public String getLinkToResource() {
         return link_to_resource;
     }
-
 
 
 }

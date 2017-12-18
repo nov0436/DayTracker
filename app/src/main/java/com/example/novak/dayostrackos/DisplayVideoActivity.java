@@ -7,12 +7,17 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.Image;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -33,6 +38,7 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -41,14 +47,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class DisplayNoteActivity extends AppCompatActivity implements View.OnClickListener {
+import static com.example.novak.dayostrackos.VideoActivity.REQUEST_VIDEO_CAPTURE;
 
-    TextView textView;
+public class DisplayVideoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Database db;
-    private static final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
-    static final int GET_DATE_TIME = 1;
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
 
     EditText titleEditText;
@@ -62,10 +66,10 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
 
     ImageView btnDeleteRecord;
     ImageView btnSaveForm;
+    ImageView thumbnailImageView;
+    ImageView playImageView;
+
     Button btnSelectCategory;
-
-
-    CheckBox checkBoxSaveLocation;
 
     String title;
     String content;
@@ -75,15 +79,12 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
     String category;
     String link_to_resource;
 
-    int year, month, day, hour, minute;
-    int yearFinal, monthFinal, dayFinal, hourFinal, minuteFinal;
-
     Record record;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_note);
+        setContentView(R.layout.activity_display_video);
 
         Intent incomingIntent = getIntent();
         record = (Record)incomingIntent.getSerializableExtra("recordObject");
@@ -113,16 +114,28 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
 
         locationTextView = (TextView)findViewById(R.id.locationResultTextView);
 
+        thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
+        playImageView = (ImageView) findViewById(R.id.playImageView);
+
+        displayThumbnail();
+
+        thumbnailImageView.setOnClickListener(this);
+        playImageView.setOnClickListener(this);
+
         // setting of fields from the incoming object
         if (record.getLocation() != null)
             locationTextView.setText(record.getLocation());
         else
             locationTextView.setText("not specified");
 
+        link_to_resource = record.getLinkToResource();
+
         titleEditText.setText(record.getTitle());
         contentEditText.setText(record.getText());
         selectedCategoryTextView.setText(record.getCategory());
         dateTimeDisplayTextView.setText(record.getDatetime());
+
+
     }
 
     @Override
@@ -130,7 +143,7 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
         int id = v.getId();
 
         switch (id) {
-           case R.id.saveImageView:
+            case R.id.saveImageView:
                 if (formIsValid())
                 {
                     saveData();
@@ -149,6 +162,14 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
                 startActivityForResult(intentCategory, GET_CATEGORY_FROM_LISTVIEW);
                 break;
 
+            case R.id.thumbnailImageView:
+                dispatchPlayVideoIntent();
+                break;
+
+            case R.id.playImageView:
+                dispatchPlayVideoIntent();
+                break;
+
         }
     }
 
@@ -158,19 +179,17 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
 
         if (deleteSuccess != 0)
         {
-            Toast.makeText(this, "The note has been successfully deleted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video has been successfully deleted.", Toast.LENGTH_SHORT).show();
             finish();
         }
         else
-            Toast.makeText(this, "The note could not be deleted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video could not be deleted.", Toast.LENGTH_SHORT).show();
     }
 
     private void saveData() {
         title = titleEditText.getText().toString();
         content = contentEditText.getText().toString();
-        type = "note";
         category = selectedCategoryTextView.getText().toString();
-        link_to_resource = null;
 
         Record recordWithUpdatedValues = new Record(record.id, title, content, type, dateTime, category, locationCity, link_to_resource);
 
@@ -179,14 +198,44 @@ public class DisplayNoteActivity extends AppCompatActivity implements View.OnCli
 
         if (updateSuccess != 0)
         {
-            Toast.makeText(this, "The note has been successfully saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video has been successfully saved.", Toast.LENGTH_SHORT).show();
             finish();
         }
         else
-            Toast.makeText(this, "The note could not be saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video could not be saved.", Toast.LENGTH_SHORT).show();
+    }
 
+    File videoFileGlobal;
+
+    private void dispatchPlayVideoIntent() {
+        Uri uri = Uri.parse(record.getLinkToResource());
+
+        Intent videoIntent = new Intent();
+        videoIntent.setAction(Intent.ACTION_VIEW);
+        videoIntent.setDataAndType(uri, "video/mp4");
+        startActivity(videoIntent);
 
     }
+
+
+    private void displayThumbnail()
+    {
+        final int THUMBSIZE = 256;
+
+        Uri newUri = Uri.parse(record.getLinkToResource());
+
+        File videoFile = new File(newUri.getPath());
+
+        Bitmap thumbImage = createThumbnailFromPath(videoFile.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND);
+
+        thumbnailImageView.setImageBitmap(thumbImage);
+    }
+
+    public Bitmap createThumbnailFromPath(String filePath, int type){
+        return ThumbnailUtils.createVideoThumbnail(filePath, type);
+    }
+
+
 
     private boolean formIsValid() {
         if (TextUtils.isEmpty(titleEditText.getText().toString()))
