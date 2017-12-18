@@ -4,22 +4,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.media.Image;
+
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -33,14 +29,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class PhotoActivity extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
+public class PhotoActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
@@ -64,7 +58,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     TextView dateTimeHintTextView;
 
     TextView selectedCategoryTextView;
-    TextView cityNameTextView;
 
     Button btnSaveForm;
     Button btnSelectCategory;
@@ -73,7 +66,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     ImageView btnTakePicture;
     ImageView thumbnailImageView;
 
-    TextView textView;
     String linkToPictureToSave;
     Uri pictureUri;
 
@@ -99,7 +91,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);
@@ -108,8 +99,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         dateTime = new SimpleDateFormat("yyyy-MM-dd   HH:mm").format(new Date());
         dateTimeDisplayTextView.setText(dateTime);
         btnSaveForm = (Button) findViewById(R.id.buttonSave);
-
-        /// jednotna cast end
 
 
         thumbnailImageView = (ImageView) findViewById(R.id.thumbnailImageView);
@@ -135,13 +124,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.buttonSave:
-                if (formIsValid())
-                {
+                if (formIsValid()) {
                     SaveData();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.form_not_valid), Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -152,25 +138,20 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
             case R.id.locationCheckBox:
                 if (checkBoxSaveLocation.isChecked()) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
                     Locator locator = new Locator(getApplicationContext());
                     Location location = locator.getLocation();
 
-                    if (location != null)
-                    {
+                    if (location != null) {
                         double lat = location.getLatitude();
                         double lon = location.getLongitude();
                         locationCity = locator.getCityNameAtLocation(lat, lon);
-                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG ).show();
+                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.unable_to_use_gps), Toast.LENGTH_LONG).show();
                     }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(), "Unable to get your location.", Toast.LENGTH_LONG ).show();
-                    }
-                }
-                else
-                {
+                } else {
                     locationCity = null;
                 }
                 break;
@@ -199,31 +180,25 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         this.db = new Database(getApplicationContext());
         long insertSuccess = this.db.insert(record);
 
-        if (insertSuccess != 0)
-        {
-            Toast.makeText(this, "The photo has been successfully saved.", Toast.LENGTH_SHORT).show();
+        if (insertSuccess != 0) {
+            Toast.makeText(this, getResources().getString(R.string.toast_photo_saved), Toast.LENGTH_SHORT).show();
             finish();
-        }
-        else
-            Toast.makeText(this, "The photo could not be saved.", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, getResources().getString(R.string.toast_photo_not_saved), Toast.LENGTH_SHORT).show();
 
     }
 
     private boolean formIsValid() {
-        if (TextUtils.isEmpty(titleEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(titleEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(contentEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(contentEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(category))
-        {
+        if (TextUtils.isEmpty(category)) {
             return false;
         }
-        if (TextUtils.isEmpty(linkToPictureToSave))
-        {
+        if (TextUtils.isEmpty(linkToPictureToSave)) {
             return false;
         }
         return true;
@@ -233,7 +208,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == GET_CATEGORY_FROM_LISTVIEW) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 category = data.getStringExtra("category");
                 selectedCategoryTextView.setText(category);
             }
@@ -242,7 +217,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
             displayThumbnail();
         }
     }
-
 
 
     private void dispatchTakePictureIntent() {
@@ -255,17 +229,16 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
         linkToPictureToSave = pictureUri.toString();
 
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri );
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri);
         startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
 
-}
+    }
 
     private String getPictureName() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + ".jpg";
         return imageFileName;
     }
-
 
 
     private void displayThumbnail() {

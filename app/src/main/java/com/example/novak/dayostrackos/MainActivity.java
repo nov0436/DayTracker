@@ -21,7 +21,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    Button buttonNote, buttonPhoto, buttonVideo, buttonVoice, buttonLocation;
+    Button buttonNote, buttonPhoto, buttonVideo, buttonVoice;
 
 
     @Override
@@ -31,25 +31,15 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        buttonNote = (Button)findViewById(R.id.btnNote);
-        buttonPhoto = (Button)findViewById(R.id.btnPhoto);
-        buttonVideo = (Button)findViewById(R.id.btnVideo);
-        buttonVoice = (Button)findViewById(R.id.btnVoice);
+        buttonNote = (Button) findViewById(R.id.btnNote);
+        buttonPhoto = (Button) findViewById(R.id.btnPhoto);
+        buttonVideo = (Button) findViewById(R.id.btnVideo);
+        buttonVoice = (Button) findViewById(R.id.btnVoice);
 
         buttonNote.setOnClickListener(this);
         buttonPhoto.setOnClickListener(this);
         buttonVideo.setOnClickListener(this);
         buttonVoice.setOnClickListener(this);
-
-        // This may very well be deleted in the future. Really.
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -125,7 +115,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View v) {
         int id = v.getId();
 
-        switch (id){
+        switch (id) {
             case R.id.btnNote:
                 Intent intentNote = new Intent(this, WriteNoteActivity.class);
                 startActivity(intentNote);

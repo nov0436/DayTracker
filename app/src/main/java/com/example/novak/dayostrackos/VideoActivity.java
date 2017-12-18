@@ -6,9 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -34,7 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class VideoActivity  extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
+public class VideoActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
@@ -58,7 +56,6 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
     TextView dateTimeHintTextView;
 
     TextView selectedCategoryTextView;
-    TextView cityNameTextView;
 
     Button btnSaveForm;
     Button btnSelectCategory;
@@ -70,7 +67,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
     String linkToVideoToSave;
 
     static final int REQUEST_VIDEO_CAPTURE = 1;
-
+    Uri videoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +88,6 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);
@@ -125,13 +121,10 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.buttonSave:
-                if (formIsValid())
-                {
+                if (formIsValid()) {
                     SaveData();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.form_not_valid), Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -142,25 +135,20 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
 
             case R.id.locationCheckBox:
                 if (checkBoxSaveLocation.isChecked()) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
                     Locator locator = new Locator(getApplicationContext());
                     Location location = locator.getLocation();
 
-                    if (location != null)
-                    {
+                    if (location != null) {
                         double lat = location.getLatitude();
                         double lon = location.getLongitude();
                         locationCity = locator.getCityNameAtLocation(lat, lon);
-                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG ).show();
+                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.unable_to_use_gps), Toast.LENGTH_LONG).show();
                     }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(), "Unable to get your location.", Toast.LENGTH_LONG ).show();
-                    }
-                }
-                else
-                {
+                } else {
                     locationCity = null;
                 }
                 break;
@@ -175,6 +163,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
 
         }
     }
+
     private void SaveData() {
 
         title = titleEditText.getText().toString();
@@ -188,36 +177,32 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
         this.db = new Database(getApplicationContext());
         long insertSuccess = this.db.insert(record);
 
-        if (insertSuccess != 0)
-        {
-            Toast.makeText(this, "The video has been successfully saved.", Toast.LENGTH_SHORT).show();
+        if (insertSuccess != 0) {
+            Toast.makeText(this, getResources().getString(R.string.toast_video_saved), Toast.LENGTH_SHORT).show();
             finish();
-        }
-        else
-            Toast.makeText(this, "The video could not be saved.", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, getResources().getString(R.string.toast_video_not_saved), Toast.LENGTH_SHORT).show();
 
     }
 
     private boolean formIsValid() {
-        if (TextUtils.isEmpty(titleEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(titleEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(contentEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(contentEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(category))
-        {
+        if (TextUtils.isEmpty(category)) {
             return false;
         }
-        if (TextUtils.isEmpty(linkToVideoToSave))
-        {
+        if (TextUtils.isEmpty(linkToVideoToSave)) {
             return false;
         }
         return true;
     }
+
     File videoFileGlobal;
+
     private void dispatchRecordVideoIntent() {
         Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
@@ -230,7 +215,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
 
         linkToVideoToSave = videoUri.toString();
 
-        videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri );
+        videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
         startActivityForResult(videoIntent, REQUEST_VIDEO_CAPTURE);
 
     }
@@ -239,7 +224,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == GET_CATEGORY_FROM_LISTVIEW) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 category = data.getStringExtra("category");
                 selectedCategoryTextView.setText(category);
             }
@@ -249,10 +234,6 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-
-    Uri videoUri;
-
-
     private String getVideoName() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String videoFileName = "VID_" + timeStamp + ".3gp";
@@ -260,13 +241,8 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
     }
 
 
-
     private void displayThumbnail() {
         final int THUMBSIZE = 256;
-        String tempUriString = videoUri.toString();
-        Uri newUri = Uri.parse(tempUriString);
-
-        File videoFile = new File(newUri.getPath());
 
         Bitmap thumbImage = createThumbnailFromPath(videoFileGlobal.getAbsolutePath(), MediaStore.Images.Thumbnails.MICRO_KIND);
 
@@ -274,7 +250,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
         thumbnailImageView.setVisibility(View.VISIBLE);
     }
 
-    public Bitmap createThumbnailFromPath(String filePath, int type){
+    public Bitmap createThumbnailFromPath(String filePath, int type) {
         return ThumbnailUtils.createVideoThumbnail(filePath, type);
     }
 

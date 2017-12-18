@@ -1,30 +1,18 @@
 package com.example.novak.dayostrackos;
 
-
 import android.app.Activity;
-
 import android.content.Intent;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -69,7 +57,6 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
         record = (Record) incomingIntent.getSerializableExtra("recordObject");
 
 
-        ///
         btnDeleteRecord = (ImageView) findViewById(R.id.deleteImageView);
         btnSaveForm = (ImageView) findViewById(R.id.saveImageView);
         btnSelectCategory = (Button) findViewById(R.id.buttonSelectCategory);
@@ -84,7 +71,6 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
 
-        // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         contentEditText = (EditText) findViewById(R.id.noteEditText);
 
@@ -108,8 +94,6 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
         contentEditText.setText(record.getText());
         selectedCategoryTextView.setText(record.getCategory());
         dateTimeDisplayTextView.setText(record.getDatetime());
-
-
     }
 
     @Override
@@ -121,7 +105,7 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
                 if (formIsValid()) {
                     saveData();
                 } else {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.form_not_valid), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.deleteImageView:
@@ -151,7 +135,7 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
         }
         catch(NullPointerException e)
         {
-            Toast.makeText(this, "The recording could not be played.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.form_could_not_play_recording), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -160,10 +144,10 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
         long deleteSuccess = this.db.delete(record.id);
 
         if (deleteSuccess != 0) {
-            Toast.makeText(this, "The recording has been successfully deleted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.toast_record_deleted), Toast.LENGTH_SHORT).show();
             finish();
         } else
-            Toast.makeText(this, "The recording could not be deleted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.form_could_not_delete_recording), Toast.LENGTH_SHORT).show();
     }
 
     private void saveData() {
@@ -177,23 +161,11 @@ public class DisplayVoiceActivity extends AppCompatActivity implements View.OnCl
         long updateSuccess = this.db.update(recordWithUpdatedValues);
 
         if (updateSuccess != 0) {
-            Toast.makeText(this, "The recording has been successfully saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.toast_record_saved), Toast.LENGTH_SHORT).show();
             finish();
         } else
-            Toast.makeText(this, "The recording could not be saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.toast_record_not_saved), Toast.LENGTH_SHORT).show();
     }
-
-
-    private void dispatchPlayRecordingIntent() {
-        Uri uri = Uri.parse(record.getLinkToResource());
-
-        Intent pictureIntent = new Intent(Intent.ACTION_VIEW);
-        pictureIntent.setDataAndType(uri, "image/*");
-
-        startActivity(pictureIntent);
-    }
-
-
 
     private boolean formIsValid() {
         if (TextUtils.isEmpty(titleEditText.getText().toString())) {

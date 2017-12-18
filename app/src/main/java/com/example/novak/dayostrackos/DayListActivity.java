@@ -30,14 +30,16 @@ public class DayListActivity extends AppCompatActivity implements AdapterView.On
     private static CustomAdapter adapter;
     String datetime;
 
+    boolean canProceedToDetail;
 
     protected void onResume() {
 
+        canProceedToDetail = true;
         this.db = new Database(this);
 
         Intent intent = getIntent();
         datetime = intent.getStringExtra("datetime");
-        setTitle("DayTracker:   " + datetime);
+        setTitle(getResources().getString(R.string.app_name) + " :    " + datetime);
 
         listView = (ListView) findViewById(R.id.list);
 
@@ -46,9 +48,8 @@ public class DayListActivity extends AppCompatActivity implements AdapterView.On
 
         if (records.size() == 0)
         {
-            Toast.makeText(this, "There are no records for this day.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.no_records), Toast.LENGTH_SHORT).show();
         }
-
 
         adapter = new CustomAdapter(records, getApplicationContext());
 
@@ -67,18 +68,40 @@ public class DayListActivity extends AppCompatActivity implements AdapterView.On
                         displayIntent = new Intent(getApplicationContext(), DisplayNoteActivity.class);
                         break;
                     case "video":
+                        if (record.getLinkToResource() == null)
+                        {
+                            canProceedToDetail = false;
+                        }
                         displayIntent = new Intent(getApplicationContext(), DisplayVideoActivity.class);
                         break;
                     case "photo":
+                        if (record.getLinkToResource() == null)
+                        {
+                            canProceedToDetail = false;
+                        }
                         displayIntent = new Intent(getApplicationContext(), DisplayPhotoActivity.class);
                         break;
                     case "audio":
+                        if (record.getLinkToResource() == null)
+                        {
+                            canProceedToDetail = false;
+                        }
                         displayIntent = new Intent(getApplicationContext(), DisplayVoiceActivity.class);
                         break;
                 }
 
-                displayIntent.putExtra("recordObject", record);
-                startActivity(displayIntent);
+                if (canProceedToDetail)
+                {
+                    displayIntent.putExtra("recordObject", record);
+                    startActivity(displayIntent);
+                }
+                else
+                {
+                    Toast.makeText(DayListActivity.this, getResources().getString(R.string.toast_no_longer_available), Toast.LENGTH_SHORT).show();
+                }
+
+                canProceedToDetail = true;
+
             }
         });
 
@@ -91,49 +114,17 @@ public class DayListActivity extends AppCompatActivity implements AdapterView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day_list);
-
-
-//        this.db = new Database(this);
-//
-//        Intent intent = getIntent();
-//        datetime = intent.getStringExtra("datetime");
-//        setTitle("DayTracker:   " + datetime);
-//
-//        listView=(ListView)findViewById(R.id.list);
-//
-//        records= new ArrayList<>();
-//        records = this.db.selectAllByDate(datetime);
-//
-//
-//        adapter= new CustomAdapter(records,getApplicationContext());
-//
-//        listView.setAdapter(adapter);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                Record record= records.get(position);
-//
-//                Intent displayIntent = new Intent(getApplicationContext(), DisplayNoteActivity.class);
-//                displayIntent.putExtra("recordObject", record);
-//                startActivity(displayIntent);
-//
-//            }
-//        });
     }
-
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
 
-//        Toast.makeText(this, "position: " + position, Toast.LENGTH_SHORT).show();
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Confirm");
-        builder.setMessage("Do you want to delete this item?");
+        builder.setTitle(getResources().getString(R.string.popup_title));
+        builder.setMessage(getResources().getString(R.string.popup_question));
 
-        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.popup_yes), new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -142,13 +133,13 @@ public class DayListActivity extends AppCompatActivity implements AdapterView.On
                 long deleteSuccess = db.delete(record.id);
 
                 if (deleteSuccess != 0) {
-                    Toast.makeText(DayListActivity.this, "The record has been successfully deleted.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DayListActivity.this, getResources().getString(R.string.toast_record_deleted), Toast.LENGTH_SHORT).show();
                     onResume();
                 }
             }
         });
 
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getResources().getString(R.string.popup_no), new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {

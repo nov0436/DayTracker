@@ -23,13 +23,11 @@ import java.util.ArrayList;
  * Created by novak on 17-Dec-17.
  */
 
-public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickListener{
+public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickListener {
 
     private ArrayList<Record> dataSet;
     Context mContext;
-    Bitmap icon;
 
-    // View lookup cache
     private static class ViewHolder {
         TextView titleTextView;
         TextView categoryTextView;
@@ -41,7 +39,7 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
     public CustomAdapter(ArrayList<Record> data, Context context) {
         super(context, R.layout.row_item, data);
         this.dataSet = data;
-        this.mContext=context;
+        this.mContext = context;
 
     }
 
@@ -50,25 +48,15 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
 
         int position = (Integer) v.getTag();
         Object object = getItem(position);
-        Record record = (Record)object;
-
-//        switch (v.getId())
-//        {
-//            case R.id.item_itemImageView:
-//                Snackbar.make(v, "Release date " +record.getTitle(), Snackbar.LENGTH_LONG)
-//                        .setAction("No action", null).show();
-//                break;
-//        }
+        Record record = (Record) object;
     }
 
     private int lastPosition = -1;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Get the data item for this position
         Record record = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
-        ViewHolder viewHolder; // view lookup cache stored in tag
+        ViewHolder viewHolder;
 
         final View result;
 
@@ -83,12 +71,12 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
             viewHolder.typeTextView = (TextView) convertView.findViewById(R.id.typeTextView);
             viewHolder.itemImageView = (ImageView) convertView.findViewById(R.id.itemImageView);
 
-            result=convertView;
+            result = convertView;
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
-            result=convertView;
+            result = convertView;
         }
 
         lastPosition = position;
@@ -117,7 +105,6 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
         viewHolder.typeTextView.setText(capitalizedType);
         viewHolder.itemImageView.setOnClickListener(this);
         viewHolder.itemImageView.setTag(position);
-        // Return the completed view to render on screen
 
         return convertView;
     }
@@ -135,8 +122,8 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
                     return displayPictureThumbnail(record.getLinkToResource());
                 else
                     return icon;
-                case "video":
-                    return displayVideoThumbnail(record.getLinkToResource());
+            case "video":
+                return displayVideoThumbnail(record.getLinkToResource());
             case "audio":
                 return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.voice);
             default:
@@ -146,7 +133,6 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
 
 
     private Bitmap displayVideoThumbnail(String link) {
-        final int THUMBSIZE = 128;
 
         Uri fileUri = Uri.parse(link);
 
@@ -157,7 +143,7 @@ public class CustomAdapter extends ArrayAdapter<Record> implements View.OnClickL
         return thumbImage;
     }
 
-    public Bitmap createThumbnailFromPath(String filePath, int type){
+    public Bitmap createThumbnailFromPath(String filePath, int type) {
         return ThumbnailUtils.createVideoThumbnail(filePath, type);
     }
 

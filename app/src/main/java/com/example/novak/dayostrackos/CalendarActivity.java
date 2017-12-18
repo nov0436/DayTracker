@@ -15,8 +15,6 @@ import java.util.GregorianCalendar;
 
 public class CalendarActivity extends AppCompatActivity implements  CalendarView.OnDateChangeListener {
 
-    private Calendar calendar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

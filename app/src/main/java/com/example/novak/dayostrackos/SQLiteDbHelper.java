@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.TextView;
 
 /**
  * Created by novak on 16-Dec-17.
@@ -25,28 +24,25 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     private static final String LOCATION = "location";
     private static final String LINK_TO_RESOURCE = "link_to_resource";
 
-    private static final String[] COLUMNS = {TITLE, TEXT, TYPE, DATETIME, CATEGORY, LOCATION, LINK_TO_RESOURCE};
-
-
-    public SQLiteDbHelper(Context context)
-    {
+    public SQLiteDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.w("Database", "Creating database.");
-//        new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
+
         String CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                                                      TITLE + " TEXT, " +
-                                                      TEXT + " TEXT, " +
-                                                      TYPE + " TEXT, " +
-                                                      DATETIME + " DATETIME, " +
-                                                      CATEGORY + " TEXT, " +
-                                                      LOCATION + " TEXT, " +
-                                                      LINK_TO_RESOURCE + " TEXT )";
+                        TITLE + " TEXT, " +
+                        TEXT + " TEXT, " +
+                        TYPE + " TEXT, " +
+                        DATETIME + " DATETIME, " +
+                        CATEGORY + " TEXT, " +
+                        LOCATION + " TEXT, " +
+                        LINK_TO_RESOURCE + " TEXT )";
         db.execSQL(CREATE_TABLE);
+
     }
 
     @Override

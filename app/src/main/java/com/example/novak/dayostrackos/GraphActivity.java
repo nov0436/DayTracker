@@ -1,24 +1,15 @@
 package com.example.novak.dayostrackos;
 
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Pair;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.List;
 
 
 public class GraphActivity extends AppCompatActivity {
@@ -34,9 +25,8 @@ public class GraphActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
-//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        int numberOfOccurrencies;
+        int numberOfOccurrences;
         this.db = new Database(this);
         String currentCategory;
         categories = new ArrayList<>();
@@ -50,13 +40,13 @@ public class GraphActivity extends AppCompatActivity {
 
             categories.add(currentCategory);
 
-            numberOfOccurrencies = db.selectNumberOfOccurenciesOfCategory(currentCategory);
+            numberOfOccurrences = db.selectNumberOfOccurenciesOfCategory(currentCategory);
 
-            if (numberOfOccurrencies != 0)
+            if (numberOfOccurrences != 0)
             {
-                columns.add(new DataPoint(i, numberOfOccurrencies));
+                columns.add(new DataPoint(i, numberOfOccurrences));
 
-                String categoryWithNumber = currentCategory + ": " + numberOfOccurrencies;
+                String categoryWithNumber = currentCategory + ": " + numberOfOccurrences;
                 listOfCategories.add(categoryWithNumber);
             }
         }
@@ -80,13 +70,12 @@ public class GraphActivity extends AppCompatActivity {
                 return Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100);
             }
         });
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Records");
-        graph.getGridLabelRenderer().setHorizontalAxisTitle("Categories");
+        graph.getGridLabelRenderer().setVerticalAxisTitle(getResources().getString(R.string.graph_y));
+        graph.getGridLabelRenderer().setHorizontalAxisTitle(getResources().getString(R.string.graph_x));
 
         series.setSpacing(0);
         series.setDataWidth(1);
 
-        // draw values on top
         series.setDrawValuesOnTop(true);
 
         series.setValuesOnTopColor(Color.RED);

@@ -22,40 +22,37 @@ import java.util.Locale;
 import static android.content.Context.LOCATION_SERVICE;
 
 
-public class Locator implements LocationListener{
+public class Locator implements LocationListener {
 
     Context context;
 
-    public Locator(Context c)
-    {
+    public Locator(Context c) {
         context = c;
     }
 
-    public Location getLocation()
-    {
-        if (ContextCompat.checkSelfPermission( context, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("error","permission denied");
+    public Location getLocation() {
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("error", "permission denied");
             return null;
         }
         try {
             LocationManager lm = (LocationManager) context.getSystemService(LOCATION_SERVICE);
             boolean isGPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (isGPSEnabled){
-                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000,10,this);
+            if (isGPSEnabled) {
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 10, this);
                 Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 return loc;
-            }else{
-                Toast.makeText(context, "Please enable GPS to use this function.", Toast.LENGTH_SHORT).show();
-                Log.e("error","gps not enabled");
+            } else {
+                Toast.makeText(context, context.getResources().getString(R.string.enable_gps), Toast.LENGTH_SHORT).show();
+                Log.e("error", "gps not enabled");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public String getCityNameAtLocation(double lat, double lon)
-    {
+    public String getCityNameAtLocation(double lat, double lon) {
         String curCity = "";
 
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
@@ -63,13 +60,10 @@ public class Locator implements LocationListener{
         try {
             addressList = geocoder.getFromLocation(lat, lon, 1);
 
-            if (addressList.size() > 0)
-            {
+            if (addressList.size() > 0) {
                 curCity = addressList.get(0).getLocality();
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             Log.d("error", "error retrieving address");
         }

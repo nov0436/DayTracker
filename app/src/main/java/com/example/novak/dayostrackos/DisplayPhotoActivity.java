@@ -121,7 +121,7 @@ public class DisplayPhotoActivity extends AppCompatActivity implements View.OnCl
                 if (formIsValid()) {
                     saveData();
                 } else {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.form_not_valid), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.deleteImageView:
@@ -145,10 +145,10 @@ public class DisplayPhotoActivity extends AppCompatActivity implements View.OnCl
         long deleteSuccess = this.db.delete(record.id);
 
         if (deleteSuccess != 0) {
-            Toast.makeText(this, "The photo has been successfully deleted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.toast_photo_deleted), Toast.LENGTH_SHORT).show();
             finish();
         } else
-            Toast.makeText(this, "The photo could not be deleted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.form_could_not_delete_photo), Toast.LENGTH_SHORT).show();
     }
 
     private void saveData() {
@@ -162,10 +162,10 @@ public class DisplayPhotoActivity extends AppCompatActivity implements View.OnCl
         long updateSuccess = this.db.update(recordWithUpdatedValues);
 
         if (updateSuccess != 0) {
-            Toast.makeText(this, "The photo has been successfully saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.toast_photo_saved), Toast.LENGTH_SHORT).show();
             finish();
         } else
-            Toast.makeText(this, "The photo could not be saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.toast_photo_not_saved), Toast.LENGTH_SHORT).show();
     }
 
 

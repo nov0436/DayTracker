@@ -19,17 +19,6 @@ public class Database {
     private Context context;
     private SQLiteDatabase db;
 
-    /*
-        public String id;
-    public String title;
-    public String text;
-    public String type;
-    public String datetime;
-    public String category;
-    public String location;
-    public String link_to_resource;
-     */
-
 
     private SQLiteStatement selectStmt;
     private SQLiteStatement insertStmt;
@@ -42,6 +31,12 @@ public class Database {
     private static final String SELECT = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
             " WHERE type = (?)";
 
+    private static final String SELECT_BY_DATE = "SELECT id, title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
+            " WHERE date(datetime) = date(?);";
+
+    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
+            " WHERE category = (?) AND date(datetime) >= date(datetime('now', 'start of month')) AND date(datetime) <= date(datetime('now', 'localtime'))" ;
+
     private static final String UPDATE = "UPDATE " + TABLE_NAME + " SET title = (?), text = (?), " +
             "category = (?), location = (?), link_to_resource = (?) WHERE id = (?)";
 
@@ -50,9 +45,7 @@ public class Database {
             "values ((?), (?), (?), (?), (?), (?), (?))";
 
     private static final String DELETE = "delete from " + TABLE_NAME + " where id = (?)";
-//
-//    private static final String UPDATE = "update " + TABLE_NAME + " SET name = (?), fueltype = (?), price = (?) WHERE id = (?)";
-//    private static final String DELETE = "delete from " + TABLE_NAME + " where id = (?)";
+
 
     private Cursor c;
 
@@ -63,14 +56,10 @@ public class Database {
 
         this.db = openHelper.getWritableDatabase();
 
-
-
         this.selectStmt = this.db.compileStatement(SELECT);
         this.insertStmt = this.db.compileStatement(INSERT);
         this.updateStmt = this.db.compileStatement(UPDATE);
         this.deleteStmt = this.db.compileStatement(DELETE);
-
-//        openHelper.onUpgrade(db, 0, 1);
     }
 
     public Record getFirst() {
@@ -94,9 +83,6 @@ public class Database {
         }
         return null;
     }
-//
-//    private static final String UPDATE = "UPDATE " + TABLE_NAME + " SET title = (?), text = (?)" +
-//            "category = (?), location = (?), link_to_resource = (?) WHERE id = (?)";
 
     public long update(Record record) {
         this.updateStmt.bindString(1, record.title);
@@ -124,9 +110,7 @@ public class Database {
         return this.deleteStmt.executeUpdateDelete();
     }
 
-    //    private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
-//            "values ((?), (?), (?), (?), (?), (?), (?))";
-//
+
     public long insert(Record r){
         this.insertStmt.bindString(1, r.title);
         this.insertStmt.bindString(2, r.text);
@@ -172,28 +156,11 @@ public class Database {
     }
 
 
-//    private static final String SELECT_BY_DATE = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
-//            " WHERE datetime = strftime('%Y-%m-%d   %H:%M', '2017-12-17   17:59');";
-
-    private static final String SELECT_BY_DATE = "SELECT id, title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
-            " WHERE date(datetime) = date(?);";
-
-//    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
-//            " WHERE category = (?) AND date(?) >= date(datetime)" ;
-
-//
-//    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
-//            " WHERE category = (?) AND datetime('now', 'start of month') AND datetime('now', 'localtime')" ;
-
-
-
     public ArrayList<Record> selectAllByDate(String selectedDateTime) {
 
-        ArrayList<Record> list = new ArrayList<Record>();
+        ArrayList<Record> list = new ArrayList<>();
 
         Cursor c = db.rawQuery(SELECT_BY_DATE, new String[] {selectedDateTime});
-
-        Log.d("message", "searching for datetime: " + selectedDateTime);
 
         if (c.moveToFirst()) {
             do {
@@ -219,15 +186,12 @@ public class Database {
         return list;
     }
 
-    private static final String SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH = "SELECT COUNT(*) FROM " + TABLE_NAME +
-            " WHERE category = (?) AND date(datetime) >= date(datetime('now', 'start of month')) AND date(datetime) <= date(datetime('now', 'localtime'))" ;
+
 
     public int selectNumberOfOccurenciesOfCategory(String category) {
 
-        ArrayList<Record> list = new ArrayList<Record>();
-
         Cursor c = db.rawQuery(SELECT_COUNT_OF_OCCURENCES_OF_TYPE_IN_LAST_MONTH, new String[] {category});
-        int numberOfOccurencies = 0;// = c.getCount();
+        int numberOfOccurencies = 0;
 
         if (c.moveToNext())
         {
@@ -237,49 +201,6 @@ public class Database {
 
         return numberOfOccurencies;
     }
-
-    /*
-
-
-    public Record getFirst() {
-
-       c = this.db.query(TABLE_NAME, new String[] { "id", "name", "fueltype", "price" },
-                null, null, null, null, "name desc");
-
-        if (c.moveToFirst())
-        {
-            int id = c.getInt(0);
-            String name = (c.getString(1));
-            String fueltype = (c.getString(2));
-            int price = c.getInt(3);
-            FuelItem item = new FuelItem(id, name, fueltype, price);
-            return item;
-        }
-        return null;
-    }
-
-    public FuelItem getNext() {
-        if (c.moveToNext())
-        {
-            int id = c.getInt(0);
-            String name = (c.getString(1));
-            String fueltype = (c.getString(2));
-            int price = c.getInt(3);
-            FuelItem item = new FuelItem(id, name, fueltype, price);
-            return item;
-        }
-        return null;
-    }
-
-    public String getPrev() {
-        if (c.moveToPrevious())
-            return (c.getString(0));
-
-        return "no more records";
-    }
-
-*/
-
 
 
 }

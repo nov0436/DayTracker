@@ -4,22 +4,16 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
+
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -29,23 +23,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
 
-import java.text.DateFormat;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class WriteNoteActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
     private Database db;
-    private static final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
-    static final int GET_DATE_TIME = 1;
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
 
     EditText titleEditText;
@@ -55,7 +42,6 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
     TextView dateTimeHintTextView;
 
     TextView selectedCategoryTextView;
-    TextView cityNameTextView;
 
     Button btnSaveForm;
     Button btnSelectCategory;
@@ -92,7 +78,6 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);
@@ -119,13 +104,10 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
                 break;
 
             case R.id.buttonSave:
-                if (formIsValid())
-                {
+                if (formIsValid()) {
                     SaveData();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.form_not_valid), Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -136,25 +118,20 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
 
             case R.id.locationCheckBox:
                 if (checkBoxSaveLocation.isChecked()) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
                     Locator locator = new Locator(getApplicationContext());
                     Location location = locator.getLocation();
 
-                    if (location != null)
-                    {
+                    if (location != null) {
                         double lat = location.getLatitude();
                         double lon = location.getLongitude();
                         locationCity = locator.getCityNameAtLocation(lat, lon);
-                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG ).show();
+                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.unable_to_use_gps), Toast.LENGTH_LONG).show();
                     }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(), "Unable to get your location.", Toast.LENGTH_LONG ).show();
-                    }
-                }
-                else
-                {
+                } else {
                     locationCity = null;
                 }
                 break;
@@ -165,9 +142,7 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         title = titleEditText.getText().toString();
         content = contentEditText.getText().toString();
         type = "note";
-//        dateTime
         category = selectedCategoryTextView.getText().toString();
-        // locationCity
         link_to_resource = null;
 
         Record record = new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
@@ -175,28 +150,21 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         this.db = new Database(getApplicationContext());
         long insertSuccess = this.db.insert(record);
 
-        if (insertSuccess != 0)
-        {
-            Toast.makeText(this, "The note has been successfully saved.", Toast.LENGTH_SHORT).show();
+        if (insertSuccess != 0) {
+            Toast.makeText(this, getResources().getString(R.string.toast_note_saved), Toast.LENGTH_SHORT).show();
             finish();
-        }
-        else
-            Toast.makeText(this, "The note could not be saved.", Toast.LENGTH_SHORT).show();
-
-
+        } else
+            Toast.makeText(this, getResources().getString(R.string.toast_note_not_saved), Toast.LENGTH_SHORT).show();
     }
 
     private boolean formIsValid() {
-        if (TextUtils.isEmpty(titleEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(titleEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(contentEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(contentEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(category))
-        {
+        if (TextUtils.isEmpty(category)) {
             return false;
         }
         return true;
@@ -206,13 +174,12 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == GET_CATEGORY_FROM_LISTVIEW) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 category = data.getStringExtra("category");
                 selectedCategoryTextView.setText(category);
             }
         }
     }
-
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -227,7 +194,6 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         TimePickerDialog timePickerDialog = new TimePickerDialog(WriteNoteActivity.this, WriteNoteActivity.this,
                 hour, minute, android.text.format.DateFormat.is24HourFormat(this));
         timePickerDialog.show();
-
     }
 
     @Override
@@ -237,6 +203,5 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
 
         dateTime = String.format("%d-%d-%d   %d:%d", yearFinal, monthFinal, dayFinal, hourFinal, minuteFinal);
         dateTimeDisplayTextView.setText(dateTime);
-
     }
 }

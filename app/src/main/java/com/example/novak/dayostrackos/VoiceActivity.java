@@ -7,13 +7,10 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -35,7 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class VoiceActivity extends AppCompatActivity implements View.OnClickListener , DatePickerDialog.OnDateSetListener,
+public class VoiceActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
     static final int GET_CATEGORY_FROM_LISTVIEW = 2;
@@ -59,7 +56,6 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     TextView dateTimeHintTextView;
 
     TextView selectedCategoryTextView;
-    TextView cityNameTextView;
 
     Button btnSaveForm;
     Button btnSelectCategory;
@@ -92,7 +88,6 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);
@@ -128,13 +123,10 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.buttonSave:
-                if (formIsValid())
-                {
+                if (formIsValid()) {
                     SaveData();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.form_not_valid), Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -145,25 +137,20 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
 
             case R.id.locationCheckBox:
                 if (checkBoxSaveLocation.isChecked()) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
                     Locator locator = new Locator(getApplicationContext());
                     Location location = locator.getLocation();
 
-                    if (location != null)
-                    {
+                    if (location != null) {
                         double lat = location.getLatitude();
                         double lon = location.getLongitude();
                         locationCity = locator.getCityNameAtLocation(lat, lon);
-                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG ).show();
+                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.unable_to_use_gps), Toast.LENGTH_LONG).show();
                     }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(), "Unable to get your location.", Toast.LENGTH_LONG ).show();
-                    }
-                }
-                else
-                {
+                } else {
                     locationCity = null;
                 }
                 break;
@@ -182,6 +169,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
 
         }
     }
+
     private void SaveData() {
 
         title = titleEditText.getText().toString();
@@ -195,31 +183,25 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
         this.db = new Database(getApplicationContext());
         long insertSuccess = this.db.insert(record);
 
-        if (insertSuccess != 0)
-        {
-            Toast.makeText(this, "The recording has been successfully saved.", Toast.LENGTH_SHORT).show();
+        if (insertSuccess != 0) {
+            Toast.makeText(this, getResources().getString(R.string.toast_record_saved), Toast.LENGTH_SHORT).show();
             finish();
-        }
-        else
-            Toast.makeText(this, "The recording could not be saved.", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, getResources().getString(R.string.toast_record_not_saved), Toast.LENGTH_SHORT).show();
 
     }
 
     private boolean formIsValid() {
-        if (TextUtils.isEmpty(titleEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(titleEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(contentEditText.getText().toString()))
-        {
+        if (TextUtils.isEmpty(contentEditText.getText().toString())) {
             return false;
         }
-        if (TextUtils.isEmpty(category))
-        {
+        if (TextUtils.isEmpty(category)) {
             return false;
         }
-        if (TextUtils.isEmpty(linkToRecordingToSave))
-        {
+        if (TextUtils.isEmpty(linkToRecordingToSave)) {
             return false;
         }
         return true;
@@ -229,20 +211,16 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     private void dispatchRecordVoiceIntent() {
         Intent recordingIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
 
-//        linkToRecordingToSave = voiceUri.toString();
-//
-//        recordingIntent.putExtra(MediaStore.EXTRA_OUTPUT, voiceUri );
         startActivityForResult(recordingIntent, REQUEST_VOICE_CAPTURE);
 
     }
 
-    public static String getPathForAudio(Context context, Uri uri)
-    {
+    public static String getPathForAudio(Context context, Uri uri) {
         String result = null;
         Cursor cursor = null;
 
         try {
-            String[] proj = { MediaStore.Audio.Media.DATA };
+            String[] proj = {MediaStore.Audio.Media.DATA};
             cursor = context.getContentResolver().query(uri, proj, null, null, null);
             if (cursor == null) {
                 result = uri.getPath();
@@ -252,12 +230,9 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
                 result = cursor.getString(column_index);
                 cursor.close();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (cursor != null) {
                 cursor.close();
             }
@@ -269,7 +244,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == GET_CATEGORY_FROM_LISTVIEW) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 category = data.getStringExtra("category");
                 selectedCategoryTextView.setText(category);
             }
@@ -283,8 +258,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
             voiceUri = uriPath;
             linkToRecordingToSave = voiceUri.toString();
             playImageView.setVisibility(View.VISIBLE);
-        }
-        else if (requestCode == REQUEST_VOICE_CAPTURE && resultCode == RESULT_CANCELED) {
+        } else if (requestCode == REQUEST_VOICE_CAPTURE && resultCode == RESULT_CANCELED) {
             playImageView.setVisibility(View.INVISIBLE);
         }
     }
@@ -300,21 +274,14 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-
     private void playRecording() {
 
-        String tempUriString = voiceUri.toString();
-        Uri newUri = Uri.parse(tempUriString);
-
-        try{
-            MediaPlayer  mp = MediaPlayer.create(getApplicationContext(), voiceUri);
+        try {
+            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), voiceUri);
             mp.start();
-        }catch(NullPointerException e) {
-            // handle NullPointerException
+        } catch (NullPointerException e) {
+            Toast.makeText(this, getResources().getString(R.string.form_could_not_play_recording), Toast.LENGTH_SHORT).show();
         }
-
-//        Toast.makeText(this, tempUriString, Toast.LENGTH_SHORT).show();
-
     }
 
     ////////////////////////////////////
