@@ -39,8 +39,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class WriteNoteActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener,
-        TimePickerDialog.OnTimeSetListener {
+public class DisplayNoteActivity extends AppCompatActivity implements View.OnClickListener {
+
+    TextView textView;
 
     private Database db;
     private static final int MY_PERMISSION_REQUEST_LOCATION = 1;
@@ -55,10 +56,13 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
     TextView dateTimeHintTextView;
 
     TextView selectedCategoryTextView;
-    TextView cityNameTextView;
+    TextView locationTextView;
 
+    Button btnDeleteRecord;
     Button btnSaveForm;
     Button btnSelectCategory;
+
+
     CheckBox checkBoxSaveLocation;
 
     String title;
@@ -72,61 +76,70 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
     int year, month, day, hour, minute;
     int yearFinal, monthFinal, dayFinal, hourFinal, minuteFinal;
 
+    Record record;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_write_note);
+        setContentView(R.layout.activity_display_note);
+
+        Intent incomingIntent = getIntent();
+        record = (Record)incomingIntent.getSerializableExtra("recordObject");
+
 
 
         ///
+        btnDeleteRecord = (Button) findViewById(R.id.buttonDelete);
         btnSaveForm = (Button) findViewById(R.id.buttonSave);
         btnSelectCategory = (Button) findViewById(R.id.buttonSelectCategory);
-        checkBoxSaveLocation = (CheckBox) findViewById(R.id.locationCheckBox);
 
+        btnDeleteRecord.setOnClickListener(this);
         btnSaveForm.setOnClickListener(this);
         btnSelectCategory.setOnClickListener(this);
-        checkBoxSaveLocation.setOnClickListener(this);
 
         dateTimeDisplayTextView = (TextView) findViewById(R.id.dateTimeDisplayTextView);
         dateTimeDisplayTextView.setOnClickListener(this);
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         contentEditText = (EditText) findViewById(R.id.noteEditText);
 
         dateTime = new SimpleDateFormat("yyyy-MM-dd   HH:mm").format(new Date());
-        dateTimeDisplayTextView.setText(dateTime);
+
+        locationTextView = (TextView)findViewById(R.id.locationResultTextView);
+
+        // setting of fields from the incoming object
+        if (record.getLocation() != null)
+            locationTextView.setText(record.getLocation());
+        else
+            locationTextView.setText("not specified");
+
+        titleEditText.setText(record.getTitle());
+        contentEditText.setText(record.getText());
+        selectedCategoryTextView.setText(record.getCategory());
+        dateTimeDisplayTextView.setText(record.getDatetime());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         int id = v.getId();
 
         switch (id) {
-            case R.id.dateTimeDisplayTextView:
-                Calendar c = Calendar.getInstance();
-                year = c.get(Calendar.YEAR);
-                month = c.get(Calendar.MONTH);
-                day = c.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(WriteNoteActivity.this, WriteNoteActivity.this, year, month, day);
-                datePickerDialog.show();
-                break;
-
-            case R.id.buttonSave:
+           case R.id.buttonSave:
                 if (formIsValid())
                 {
-                    SaveData();
+                    saveData();
                 }
                 else
                 {
                     Toast.makeText(getApplicationContext(), "The form is not valid. Cannot save data.", Toast.LENGTH_LONG ).show();
                 }
+                break;
+            case R.id.buttonDelete:
+                deleteData();
                 break;
 
             case R.id.buttonSelectCategory:
@@ -134,49 +147,35 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
                 startActivityForResult(intentCategory, GET_CATEGORY_FROM_LISTVIEW);
                 break;
 
-            case R.id.locationCheckBox:
-                if (checkBoxSaveLocation.isChecked()) {
-                    ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
-
-                    Locator locator = new Locator(getApplicationContext());
-                    Location location = locator.getLocation();
-
-                    if (location != null)
-                    {
-                        double lat = location.getLatitude();
-                        double lon = location.getLongitude();
-                        locationCity = locator.getCityNameAtLocation(lat, lon);
-                        Toast.makeText(getApplicationContext(), locationCity, Toast.LENGTH_LONG ).show();
-                    }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(), "Unable to get your location.", Toast.LENGTH_LONG ).show();
-                    }
-                }
-                else
-                {
-                    locationCity = null;
-                }
-                break;
         }
     }
 
-    private void SaveData() {
+    private void deleteData() {
+        this.db = new Database(getApplicationContext());
+        long deleteSuccess = this.db.delete(record.id);
+
+        if (deleteSuccess != 0)
+        {
+            Toast.makeText(this, "The note has been successfully deleted.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else
+            Toast.makeText(this, "The note could not be deleted.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveData() {
         title = titleEditText.getText().toString();
         content = contentEditText.getText().toString();
         type = "note";
-//        dateTime
         category = selectedCategoryTextView.getText().toString();
-        // locationCity
         link_to_resource = null;
 
-
-        Record record = new Record(title, content, type, dateTime, category, locationCity, link_to_resource);
+        Record recordWithUpdatedValues = new Record(record.id, title, content, type, dateTime, category, locationCity, link_to_resource);
 
         this.db = new Database(getApplicationContext());
-        long insertSuccess = this.db.insert(record);
+        long updateSuccess = this.db.update(recordWithUpdatedValues);
 
-        if (insertSuccess != 0)
+        if (updateSuccess != 0)
         {
             Toast.makeText(this, "The note has been successfully saved.", Toast.LENGTH_SHORT).show();
             finish();
@@ -196,7 +195,7 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         {
             return false;
         }
-        if (TextUtils.isEmpty(category))
+        if (TextUtils.isEmpty(record.getCategory()))
         {
             return false;
         }
@@ -212,32 +211,5 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
                 selectedCategoryTextView.setText(category);
             }
         }
-    }
-
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        yearFinal = year;
-        monthFinal = month + 1;
-        dayFinal = dayOfMonth;
-
-        Calendar c = Calendar.getInstance();
-        hour = c.get(Calendar.HOUR_OF_DAY);
-        minute = c.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(WriteNoteActivity.this, WriteNoteActivity.this,
-                hour, minute, android.text.format.DateFormat.is24HourFormat(this));
-        timePickerDialog.show();
-
-    }
-
-    @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        hourFinal = hourOfDay;
-        minuteFinal = minute;
-
-        dateTime = String.format("%d-%d-%d   %d:%d", yearFinal, monthFinal, dayFinal, hourFinal, minuteFinal);
-        dateTimeDisplayTextView.setText(dateTime);
-
     }
 }

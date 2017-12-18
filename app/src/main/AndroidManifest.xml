@@ -52,7 +52,8 @@
         <activity android:name=".PhotoActivity" />
         <activity android:name=".VideoActivity" />
         <activity android:name=".VoiceActivity" />
-        <activity android:name=".DayListActivity"></activity>
+        <activity android:name=".DayListActivity" />
+        <activity android:name=".DisplayNoteActivity"></activity>
     </application>
 
 </manifest>

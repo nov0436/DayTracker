@@ -42,11 +42,14 @@ public class Database {
     private static final String SELECT = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
             " WHERE type = (?)";
 
-
+    private static final String UPDATE = "UPDATE " + TABLE_NAME + " SET title = (?), text = (?), " +
+            "category = (?), location = (?), link_to_resource = (?) WHERE id = (?)";
 
 
     private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
             "values ((?), (?), (?), (?), (?), (?), (?))";
+
+    private static final String DELETE = "delete from " + TABLE_NAME + " where id = (?)";
 //
 //    private static final String UPDATE = "update " + TABLE_NAME + " SET name = (?), fueltype = (?), price = (?) WHERE id = (?)";
 //    private static final String DELETE = "delete from " + TABLE_NAME + " where id = (?)";
@@ -64,8 +67,8 @@ public class Database {
 
         this.selectStmt = this.db.compileStatement(SELECT);
         this.insertStmt = this.db.compileStatement(INSERT);
-//        this.updateStmt = this.db.compileStatement(UPDATE);
-//        this.deleteStmt = this.db.compileStatement(DELETE);
+        this.updateStmt = this.db.compileStatement(UPDATE);
+        this.deleteStmt = this.db.compileStatement(DELETE);
 
 //        openHelper.onUpgrade(db, 0, 1);
     }
@@ -91,8 +94,35 @@ public class Database {
         }
         return null;
     }
+//
+//    private static final String UPDATE = "UPDATE " + TABLE_NAME + " SET title = (?), text = (?)" +
+//            "category = (?), location = (?), link_to_resource = (?) WHERE id = (?)";
+
+    public long update(Record record) {
+        this.updateStmt.bindString(1, record.title);
+        this.updateStmt.bindString(2, record.text);
+        this.updateStmt.bindString(3, record.category);
+
+        if (record.location != null)
+            this.updateStmt.bindString(4, record.location);
+        else
+            this.updateStmt.bindNull(4);
+
+        if (record.link_to_resource != null)
+            this.updateStmt.bindString(5, record.link_to_resource);
+        else
+            this.updateStmt.bindNull(5);
+
+        this.updateStmt.bindString(6, String.valueOf(record.id));
+
+        return this.updateStmt.executeUpdateDelete();
+    }
 
 
+    public long delete(int id) {
+        this.deleteStmt.bindLong(1, id);
+        return this.deleteStmt.executeUpdateDelete();
+    }
 
     //    private static final String INSERT = "insert into " + TABLE_NAME + "(title, text, type, datetime, category, location, link_to_resource) " +
 //            "values ((?), (?), (?), (?), (?), (?), (?))";
@@ -145,7 +175,7 @@ public class Database {
 //    private static final String SELECT_BY_DATE = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
 //            " WHERE datetime = strftime('%Y-%m-%d   %H:%M', '2017-12-17   17:59');";
 
-    private static final String SELECT_BY_DATE = "SELECT title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
+    private static final String SELECT_BY_DATE = "SELECT id, title, text, type, datetime, category, location, link_to_resource FROM " + TABLE_NAME +
             " WHERE date(datetime) = date(?);";
 
 
@@ -160,16 +190,16 @@ public class Database {
 
         if (c.moveToFirst()) {
             do {
-//                int id = cursor.getInt(0);
-                String title = c.getString(0);
-                String text = c.getString(1);
-                String type = c.getString(2);
-                String datetime = c.getString(3);
-                String category = c.getString(4);
-                String location = c.getString(5);
-                String link_to_resource = c.getString(6);
+                int id = c.getInt(0);
+                String title = c.getString(1);
+                String text = c.getString(2);
+                String type = c.getString(3);
+                String datetime = c.getString(4);
+                String category = c.getString(5);
+                String location = c.getString(6);
+                String link_to_resource = c.getString(7);
 
-                Record record = new Record(title, text, type, datetime, category, location, link_to_resource);
+                Record record = new Record(id, title, text, type, datetime, category, location, link_to_resource);
 
                 list.add(record);
 

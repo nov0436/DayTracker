@@ -91,7 +91,7 @@ public class VideoActivity  extends AppCompatActivity implements View.OnClickLis
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
+//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);

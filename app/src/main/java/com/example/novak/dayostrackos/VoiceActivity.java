@@ -92,7 +92,7 @@ public class VoiceActivity extends AppCompatActivity implements View.OnClickList
 
         dateTimeHintTextView = (TextView) findViewById(R.id.dateTimeTextView);
         selectedCategoryTextView = (TextView) findViewById(R.id.selectedCategoryTextView);
-        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
+//        cityNameTextView = (TextView) findViewById(R.id.cityTextView);
 
         // EditTexts
         titleEditText = (EditText) findViewById(R.id.titleEditText);

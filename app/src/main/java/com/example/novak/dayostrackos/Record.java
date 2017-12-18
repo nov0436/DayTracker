@@ -1,10 +1,11 @@
 package com.example.novak.dayostrackos;
+import java.io.Serializable;
 
 /**
  * Created by novak on 16-Dec-17.
  */
 
-public class Record {
+public class Record implements Serializable {
 
     public int id;
     public String title;
