@@ -12,12 +12,12 @@
             android:title="@string/menu_calendar" />
         <item
             android:id="@+id/menu_visual_overview"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_menu_share"
             android:title="@string/menu_visual_overview" />
         <item
-            android:id="@+id/menu_about"
+            android:id="@+id/menu_settings"
             android:icon="@drawable/ic_menu_manage"
-            android:title="@string/menu_about" />
+            android:title="@string/menu_settings" />
     </group>
 
     <item

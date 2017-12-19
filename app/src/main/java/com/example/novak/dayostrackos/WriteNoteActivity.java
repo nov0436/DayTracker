@@ -63,8 +63,6 @@ public class WriteNoteActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_note);
 
-
-        ///
         btnSaveForm = (Button) findViewById(R.id.buttonSave);
         btnSelectCategory = (Button) findViewById(R.id.buttonSelectCategory);
         checkBoxSaveLocation = (CheckBox) findViewById(R.id.locationCheckBox);
